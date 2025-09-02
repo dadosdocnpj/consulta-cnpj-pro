@@ -68,11 +68,15 @@ export default {
 			},
 			backgroundImage: {
 				'gradient-hero': 'var(--gradient-hero)',
-				'gradient-subtle': 'var(--gradient-subtle)'
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-subtle': 'var(--gradient-subtle)',
+				'gradient-accent': 'var(--gradient-accent)'
 			},
 			boxShadow: {
 				'soft': 'var(--shadow-soft)',
-				'glow': 'var(--shadow-glow)'
+				'medium': 'var(--shadow-medium)',
+				'glow': 'var(--shadow-glow)',
+				'card': 'var(--shadow-card)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -80,7 +84,13 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			transitionTimingFunction: {
-				'smooth': 'var(--transition-smooth)'
+				'smooth': 'var(--transition-smooth)',
+				'spring': 'var(--transition-spring)',
+				'bounce': 'var(--transition-bounce)'
+			},
+			fontFamily: {
+				'sans': ['Inter', 'system-ui', 'sans-serif'],
+				'heading': ['Poppins', 'Inter', 'system-ui', 'sans-serif']
 			},
 			keyframes: {
 				'accordion-down': {
