@@ -2,3 +2,6 @@ project_id = "ayyklhshzzfkutkrpipj"
 
 [functions.cnpj-lookup]
 verify_jwt = false
+
+[functions.render-cnpj]
+verify_jwt = false
