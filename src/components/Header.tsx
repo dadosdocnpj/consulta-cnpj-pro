@@ -2,7 +2,7 @@ import { Search, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import logoImage from "@/assets/logo-dadosdocnpj.png";
+const logoImage = "/lovable-uploads/d54f0af5-d59b-4d5e-9876-ba7766fd200c.png";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
