@@ -2,7 +2,7 @@ import { Search, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import logoImage from "@/assets/logo.png";
+import logoImage from "@/assets/logo-dadosdocnpj.png";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,15 +14,12 @@ const Header = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <img 
                 src={logoImage} 
                 alt="Dados do CNPJ - Portal de consulta empresarial" 
-                className="h-8 w-auto object-contain"
+                className="h-12 w-auto object-contain"
               />
-              <h1 className="text-xl font-bold text-gradient font-heading hidden sm:block">
-                DADOS DO CNPJ
-              </h1>
             </div>
 
             {/* Desktop Navigation */}
