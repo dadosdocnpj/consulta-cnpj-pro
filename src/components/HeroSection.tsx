@@ -37,14 +37,13 @@ const HeroSection = () => {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold text-primary-foreground mb-8 leading-tight font-heading">
-              Encontre as informações completas de qualquer{" "}
-              <span className="text-gradient bg-gradient-accent bg-clip-text text-transparent">CNPJ</span>{" "}
-              no Brasil
+              Descubra tudo sobre qualquer{" "}
+              <span className="text-gradient bg-gradient-accent bg-clip-text text-transparent">empresa</span>{" "}
+              do Brasil em segundos
             </h1>
             
             <p className="text-xl md:text-2xl text-primary-foreground/90 mb-12 leading-relaxed max-w-3xl mx-auto">
-              Milhões de empresas catalogadas, atualizadas e prontas para sua consulta.
-              Dados oficiais da Receita Federal.
+              Milhões de empresas na palma da sua mão. Informações sempre atualizadas para suas decisões importantes.
             </p>
           </div>
 
@@ -55,7 +54,7 @@ const HeroSection = () => {
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-500" />
                 <Input
                   type="text"
-                  placeholder="Digite o CNPJ, razão social ou nome fantasia"
+                  placeholder="Ex: Petrobras, 11.222.333/0001-81 ou Magazine Luiza"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
@@ -69,7 +68,7 @@ const HeroSection = () => {
                 className="h-16 px-10 text-lg font-bold rounded-xl"
               >
                 <Search className="h-5 w-5 mr-2" />
-                Pesquisar
+                Buscar Agora
               </Button>
             </div>
             
@@ -86,24 +85,24 @@ const HeroSection = () => {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-6 border border-primary/20">
                 <TrendingUp className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-3 text-xl">Dados Atualizados</h3>
-              <p className="text-gray-600 text-base leading-relaxed">Informações sempre atualizadas mensalmente da Receita Federal</p>
-            </div>
-            
-            <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center hover:bg-white/95 transition-all duration-300 hover:scale-105 shadow-xl">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-accent/10 rounded-2xl mb-6 border border-accent/20">
-                <Shield className="h-8 w-8 text-accent" />
-              </div>
-              <h3 className="font-bold text-gray-900 mb-3 text-xl">100% Gratuito</h3>
-              <p className="text-gray-600 text-base leading-relaxed">Consultas ilimitadas sem custo algum. Sempre será gratuito</p>
-            </div>
-            
-            <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center hover:bg-white/95 transition-all duration-300 hover:scale-105 shadow-xl">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary/10 rounded-2xl mb-6 border border-secondary/20">
-                <Clock className="h-8 w-8 text-secondary" />
-              </div>
-              <h3 className="font-bold text-gray-900 mb-3 text-xl">Consulta Rápida</h3>
-              <p className="text-gray-600 text-base leading-relaxed">Resultados em segundos com interface moderna e intuitiva</p>
+               <h3 className="font-bold text-gray-900 mb-3 text-xl">Sempre Atualizado</h3>
+               <p className="text-gray-600 text-base leading-relaxed">Informações em tempo real para decisões certeiras</p>
+             </div>
+             
+             <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center hover:bg-white/95 transition-all duration-300 hover:scale-105 shadow-xl">
+               <div className="inline-flex items-center justify-center w-16 h-16 bg-accent/10 rounded-2xl mb-6 border border-accent/20">
+                 <Shield className="h-8 w-8 text-accent" />
+               </div>
+               <h3 className="font-bold text-gray-900 mb-3 text-xl">Totalmente Grátis</h3>
+               <p className="text-gray-600 text-base leading-relaxed">Consultas ilimitadas sem pegadinhas ou custos ocultos</p>
+             </div>
+             
+             <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center hover:bg-white/95 transition-all duration-300 hover:scale-105 shadow-xl">
+               <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary/10 rounded-2xl mb-6 border border-secondary/20">
+                 <Clock className="h-8 w-8 text-secondary" />
+               </div>
+               <h3 className="font-bold text-gray-900 mb-3 text-xl">Resultados Instantâneos</h3>
+               <p className="text-gray-600 text-base leading-relaxed">Encontre o que precisa em poucos cliques</p>
             </div>
           </div>
 

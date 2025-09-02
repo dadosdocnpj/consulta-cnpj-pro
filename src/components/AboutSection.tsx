@@ -31,29 +31,46 @@ const AboutSection = () => {
           {/* Main Content */}
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
-              O que é o Dados do CNPJ?
+              Por que milhares confiam em nós?
             </h2>
             
             <div className="bg-card rounded-2xl p-8 shadow-soft border border-border max-w-4xl mx-auto">
               <div className="text-lg text-card-foreground space-y-6 text-left leading-relaxed">
                 <p className="text-xl leading-relaxed">
-                  O <strong className="text-primary">Dados do CNPJ</strong> é uma plataforma de <strong className="text-primary">consulta CNPJ gratuita</strong> que 
-                  oferece acesso completo às informações de empresas brasileiras.
+                  Somos a <strong className="text-primary">maior plataforma gratuita</strong> de consulta empresarial do Brasil, 
+                  com milhões de empresas já consultadas.
                 </p>
                 
-                <p>
-                  Nossa base de dados contém milhões de registros atualizados mensalmente, incluindo dados sobre 
-                  <strong className="text-secondary"> razão social</strong>, 
-                  <strong className="text-secondary"> nome fantasia</strong>, 
-                  <strong className="text-secondary"> situação cadastral</strong> e 
-                  <strong className="text-secondary"> atividade econômica (CNAE)</strong>.
-                </p>
-                
-                <p>
-                  Com nossa interface intuitiva, você pode pesquisar por <strong className="text-accent">número do CNPJ</strong>, 
-                  <strong className="text-accent"> razão social</strong> ou <strong className="text-accent">nome fantasia</strong>, 
-                  obtendo resultados instantâneos sobre qualquer empresa registrada no Brasil.
-                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full"></div>
+                      <span><strong className="text-secondary">Dados oficiais</strong> da Receita Federal</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full"></div>
+                      <span><strong className="text-secondary">Atualizações mensais</strong> garantidas</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-primary rounded-full"></div>
+                      <span><strong className="text-secondary">Interface moderna</strong> e intuitiva</span>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-accent rounded-full"></div>
+                      <span><strong className="text-accent">Consultas ilimitadas</strong> sem custo</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-accent rounded-full"></div>
+                      <span><strong className="text-accent">Resultados instantâneos</strong> em segundos</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-accent rounded-full"></div>
+                      <span><strong className="text-accent">Sem cadastro</strong> necessário</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -81,7 +98,7 @@ const AboutSection = () => {
           {/* Use Cases Section */}
           <div className="bg-card rounded-2xl p-10 shadow-soft border border-border">
             <h3 className="text-2xl font-bold text-card-foreground mb-8 text-center">
-              Por que usar o Dados do CNPJ?
+              Quem usa nossa plataforma?
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-4">
