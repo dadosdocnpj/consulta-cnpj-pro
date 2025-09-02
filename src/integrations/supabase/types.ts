@@ -14,13 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cnpj_cache: {
+        Row: {
+          cnpj: string
+          created_at: string
+          expires_at: string
+          html_content: string
+          id: string
+          json_data: Json
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          cnpj: string
+          created_at?: string
+          expires_at?: string
+          html_content: string
+          id?: string
+          json_data: Json
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          cnpj?: string
+          created_at?: string
+          expires_at?: string
+          html_content?: string
+          id?: string
+          json_data?: Json
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_expired_cache: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
