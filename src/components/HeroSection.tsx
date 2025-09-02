@@ -49,17 +49,17 @@ const HeroSection = () => {
           </div>
 
           {/* Main Search Card */}
-          <div className="card-modern bg-white/10 backdrop-blur-xl border-white/20 p-8 max-w-3xl mx-auto mb-16 animate-slide-up" style={{animationDelay: '0.3s'}}>
+          <div className="bg-white/95 backdrop-blur-xl border border-white/30 rounded-2xl p-8 max-w-3xl mx-auto mb-16 animate-slide-up shadow-2xl" style={{animationDelay: '0.3s'}}>
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-muted-foreground" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-500" />
                 <Input
                   type="text"
                   placeholder="Digite o CNPJ, razão social ou nome fantasia"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  className="pl-12 h-16 text-lg bg-background/90 border-0 focus:bg-background search-glow rounded-xl font-medium"
+                  className="pl-12 h-16 text-lg bg-white border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl font-medium text-gray-900 placeholder:text-gray-500"
                 />
               </div>
               <Button
@@ -73,43 +73,43 @@ const HeroSection = () => {
               </Button>
             </div>
             
-            <p className="text-primary-foreground/70 text-sm mt-4">
-              Exemplo: <span className="text-accent font-semibold">11.222.333/0001-81</span> ou{" "}
-              <span className="text-accent font-semibold">"Petrobras"</span> ou{" "}
-              <span className="text-accent font-semibold">"Banco do Brasil"</span>
+            <p className="text-gray-600 text-sm mt-4">
+              Exemplo: <span className="text-primary font-semibold">11.222.333/0001-81</span> ou{" "}
+              <span className="text-primary font-semibold">"Petrobras"</span> ou{" "}
+              <span className="text-primary font-semibold">"Banco do Brasil"</span>
             </p>
           </div>
 
           {/* Feature highlights */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12 animate-slide-up" style={{animationDelay: '0.6s'}}>
-            <div className="card-modern bg-white/8 backdrop-blur-md border-white/15 p-8 text-center hover:bg-white/12 transition-all duration-300 hover:scale-105">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/15 backdrop-blur-sm rounded-2xl mb-6 shadow-glow border border-white/20">
-                <TrendingUp className="h-8 w-8 text-white" />
+            <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center hover:bg-white/95 transition-all duration-300 hover:scale-105 shadow-xl">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-6 border border-primary/20">
+                <TrendingUp className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-bold text-primary-foreground mb-3 text-xl">Dados Atualizados</h3>
-              <p className="text-primary-foreground/85 text-base leading-relaxed">Informações sempre atualizadas mensalmente da Receita Federal</p>
+              <h3 className="font-bold text-gray-900 mb-3 text-xl">Dados Atualizados</h3>
+              <p className="text-gray-600 text-base leading-relaxed">Informações sempre atualizadas mensalmente da Receita Federal</p>
             </div>
             
-            <div className="card-modern bg-white/8 backdrop-blur-md border-white/15 p-8 text-center hover:bg-white/12 transition-all duration-300 hover:scale-105">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/15 backdrop-blur-sm rounded-2xl mb-6 shadow-glow border border-white/20">
-                <Shield className="h-8 w-8 text-white" />
+            <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center hover:bg-white/95 transition-all duration-300 hover:scale-105 shadow-xl">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-accent/10 rounded-2xl mb-6 border border-accent/20">
+                <Shield className="h-8 w-8 text-accent" />
               </div>
-              <h3 className="font-bold text-primary-foreground mb-3 text-xl">100% Gratuito</h3>
-              <p className="text-primary-foreground/85 text-base leading-relaxed">Consultas ilimitadas sem custo algum. Sempre será gratuito</p>
+              <h3 className="font-bold text-gray-900 mb-3 text-xl">100% Gratuito</h3>
+              <p className="text-gray-600 text-base leading-relaxed">Consultas ilimitadas sem custo algum. Sempre será gratuito</p>
             </div>
             
-            <div className="card-modern bg-white/8 backdrop-blur-md border-white/15 p-8 text-center hover:bg-white/12 transition-all duration-300 hover:scale-105">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/15 backdrop-blur-sm rounded-2xl mb-6 shadow-glow border border-white/20">
-                <Clock className="h-8 w-8 text-white" />
+            <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center hover:bg-white/95 transition-all duration-300 hover:scale-105 shadow-xl">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary/10 rounded-2xl mb-6 border border-secondary/20">
+                <Clock className="h-8 w-8 text-secondary" />
               </div>
-              <h3 className="font-bold text-primary-foreground mb-3 text-xl">Consulta Rápida</h3>
-              <p className="text-primary-foreground/85 text-base leading-relaxed">Resultados em segundos com interface moderna e intuitiva</p>
+              <h3 className="font-bold text-gray-900 mb-3 text-xl">Consulta Rápida</h3>
+              <p className="text-gray-600 text-base leading-relaxed">Resultados em segundos com interface moderna e intuitiva</p>
             </div>
           </div>
 
           {/* AdSense Placeholder */}
-          <div className="card-modern bg-white/5 backdrop-blur-sm border-white/10 p-8 max-w-2xl mx-auto animate-slide-up" style={{animationDelay: '0.9s'}}>
-            <p className="text-primary-foreground/60 text-sm font-medium">
+          <div className="bg-white/80 backdrop-blur-sm border border-white/30 rounded-xl p-8 max-w-2xl mx-auto animate-slide-up shadow-lg" style={{animationDelay: '0.9s'}}>
+            <p className="text-gray-500 text-sm font-medium text-center">
               [Espaço reservado para AdSense - 728x90]
             </p>
           </div>
