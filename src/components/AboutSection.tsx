@@ -25,90 +25,111 @@ const AboutSection = () => {
   ];
 
   return (
-    <section className="py-16 bg-gradient-subtle">
+    <section className="py-12 bg-gradient-subtle">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           {/* Main Content */}
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
               O que é o Dados do CNPJ?
             </h2>
             
-            <div className="text-lg text-muted-foreground space-y-4 text-left">
-              <p>
-                O <strong>Dados do CNPJ</strong> é uma plataforma de <strong>consulta CNPJ gratuita</strong> que 
-                oferece acesso completo às informações de empresas brasileiras. Nossa base de dados contém 
-                milhões de registros atualizados mensalmente, incluindo <strong>razão social</strong>, 
-                <strong>nome fantasia</strong>, <strong>situação cadastral</strong>, <strong>CNAE</strong> 
-                e muito mais.
-              </p>
-              
-              <p>
-                Seja você um empresário, contador, advogado ou apenas um cidadão curioso, nossa ferramenta 
-                permite consultar qualquer empresa de forma rápida e eficiente. Todos os dados são extraídos 
-                diretamente da Receita Federal e outros órgãos oficiais, garantindo a veracidade das informações.
-              </p>
-              
-              <p>
-                Com nossa interface intuitiva, você pode pesquisar por <strong>número do CNPJ</strong>, 
-                <strong>razão social</strong> ou <strong>nome fantasia</strong>, obtendo resultados instantâneos 
-                sobre qualquer empresa registrada no Brasil. Descubra sócios, endereços, atividades econômicas 
-                e histórico de alterações de forma completamente gratuita.
-              </p>
+            <div className="bg-card rounded-2xl p-8 shadow-soft border border-border max-w-4xl mx-auto">
+              <div className="text-lg text-card-foreground space-y-6 text-left leading-relaxed">
+                <p className="text-xl leading-relaxed">
+                  O <strong className="text-primary">Dados do CNPJ</strong> é uma plataforma de <strong className="text-primary">consulta CNPJ gratuita</strong> que 
+                  oferece acesso completo às informações de empresas brasileiras.
+                </p>
+                
+                <p>
+                  Nossa base de dados contém milhões de registros atualizados mensalmente, incluindo dados sobre 
+                  <strong className="text-secondary"> razão social</strong>, 
+                  <strong className="text-secondary"> nome fantasia</strong>, 
+                  <strong className="text-secondary"> situação cadastral</strong> e 
+                  <strong className="text-secondary"> atividade econômica (CNAE)</strong>.
+                </p>
+                
+                <p>
+                  Com nossa interface intuitiva, você pode pesquisar por <strong className="text-accent">número do CNPJ</strong>, 
+                  <strong className="text-accent"> razão social</strong> ou <strong className="text-accent">nome fantasia</strong>, 
+                  obtendo resultados instantâneos sobre qualquer empresa registrada no Brasil.
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Features Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-card rounded-lg p-6 shadow-soft border border-border text-center"
+                className="bg-card rounded-xl p-8 shadow-soft border border-border text-center hover:shadow-medium transition-all duration-300 hover:scale-105"
               >
-                <feature.icon className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-card-foreground mb-2">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-6">
+                  <feature.icon className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold text-card-foreground mb-3">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground leading-relaxed">
                   {feature.description}
                 </p>
               </div>
             ))}
           </div>
 
-          {/* Additional Info */}
-          <div className="bg-card rounded-lg p-8 shadow-soft border border-border">
-            <h3 className="text-2xl font-bold text-card-foreground mb-4">
+          {/* Use Cases Section */}
+          <div className="bg-card rounded-2xl p-10 shadow-soft border border-border">
+            <h3 className="text-2xl font-bold text-card-foreground mb-8 text-center">
               Por que usar o Dados do CNPJ?
             </h3>
-            <div className="grid md:grid-cols-2 gap-6 text-muted-foreground">
-              <div>
-                <h4 className="font-semibold text-card-foreground mb-2">Para Empresários</h4>
-                <p className="text-sm">
-                  Verifique a situação de fornecedores, clientes e parceiros comerciais antes 
-                  de fechar negócios importantes.
-                </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <div className="flex items-start space-x-4">
+                  <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-card-foreground mb-2 text-lg">Para Empresários</h4>
+                    <p className="text-base text-muted-foreground leading-relaxed">
+                      Verifique a situação de fornecedores, clientes e parceiros comerciais antes 
+                      de fechar negócios importantes.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="w-2 h-2 bg-secondary rounded-full mt-3 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-card-foreground mb-2 text-lg">Para Profissionais</h4>
+                    <p className="text-base text-muted-foreground leading-relaxed">
+                      Contadores, advogados e consultores podem acessar informações empresariais 
+                      de forma rápida e confiável.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h4 className="font-semibold text-card-foreground mb-2">Para Profissionais</h4>
-                <p className="text-sm">
-                  Contadores, advogados e consultores podem acessar informações empresariais 
-                  de forma rápida e confiável.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-card-foreground mb-2">Para Pesquisadores</h4>
-                <p className="text-sm">
-                  Analise o cenário empresarial brasileiro, identifique tendências de mercado 
-                  e conduza estudos econômicos.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-card-foreground mb-2">Para Cidadãos</h4>
-                <p className="text-sm">
-                  Consulte empresas do seu interesse, verifique a idoneidade de estabelecimentos 
-                  e mantenha-se informado.
-                </p>
+              
+              <div className="space-y-4">
+                <div className="flex items-start space-x-4">
+                  <div className="w-2 h-2 bg-accent rounded-full mt-3 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-card-foreground mb-2 text-lg">Para Pesquisadores</h4>
+                    <p className="text-base text-muted-foreground leading-relaxed">
+                      Analise o cenário empresarial brasileiro, identifique tendências de mercado 
+                      e conduza estudos econômicos.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-4">
+                  <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
+                  <div>
+                    <h4 className="font-semibold text-card-foreground mb-2 text-lg">Para Cidadãos</h4>
+                    <p className="text-base text-muted-foreground leading-relaxed">
+                      Consulte empresas do seu interesse, verifique a idoneidade de estabelecimentos 
+                      e mantenha-se informado.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

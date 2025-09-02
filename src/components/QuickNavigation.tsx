@@ -29,7 +29,7 @@ const QuickNavigation = () => {
   ];
 
   return (
-    <section className="py-16 bg-background">
+    <section className="py-12 bg-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -40,60 +40,66 @@ const QuickNavigation = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Estados */}
-          <div className="bg-card rounded-lg p-6 shadow-soft border border-border">
-            <div className="flex items-center mb-4">
-              <MapPin className="h-6 w-6 text-primary mr-2" />
+          <div className="bg-card rounded-xl p-8 shadow-soft border border-border hover:shadow-medium transition-all duration-300 h-full">
+            <div className="flex items-center mb-6">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-xl mr-4">
+                <MapPin className="h-6 w-6 text-primary" />
+              </div>
               <h3 className="text-xl font-semibold text-card-foreground">Estados</h3>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               {estados.map((estado) => (
                 <a
                   key={estado.sigla}
                   href={`/${estado.slug}/`}
-                  className="block text-muted-foreground hover:text-primary transition-smooth p-2 rounded hover:bg-accent"
+                  className="group block text-muted-foreground hover:text-primary transition-all duration-200 p-3 rounded-lg hover:bg-primary/5 border border-transparent hover:border-primary/10"
                 >
-                  {estado.sigla} - {estado.nome}
+                  <span className="font-medium">{estado.sigla}</span> - {estado.nome}
                 </a>
               ))}
             </div>
           </div>
 
           {/* Cidades */}
-          <div className="bg-card rounded-lg p-6 shadow-soft border border-border">
-            <div className="flex items-center mb-4">
-              <Building2 className="h-6 w-6 text-secondary mr-2" />
+          <div className="bg-card rounded-xl p-8 shadow-soft border border-border hover:shadow-medium transition-all duration-300 h-full">
+            <div className="flex items-center mb-6">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-secondary/10 rounded-xl mr-4">
+                <Building2 className="h-6 w-6 text-secondary" />
+              </div>
               <h3 className="text-xl font-semibold text-card-foreground">Cidades</h3>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               {cidades.map((cidade) => (
                 <a
                   key={cidade.slug}
                   href={`/${cidade.slug}/`}
-                  className="block text-muted-foreground hover:text-secondary transition-smooth p-2 rounded hover:bg-accent"
+                  className="group block text-muted-foreground hover:text-secondary transition-all duration-200 p-3 rounded-lg hover:bg-secondary/5 border border-transparent hover:border-secondary/10"
                 >
-                  {cidade.nome} - {cidade.estado}
+                  <span className="font-medium">{cidade.nome}</span> - {cidade.estado}
                 </a>
               ))}
             </div>
           </div>
 
           {/* CNAEs */}
-          <div className="bg-card rounded-lg p-6 shadow-soft border border-border">
-            <div className="flex items-center mb-4">
-              <Briefcase className="h-6 w-6 text-accent-foreground mr-2" />
+          <div className="bg-card rounded-xl p-8 shadow-soft border border-border hover:shadow-medium transition-all duration-300 h-full">
+            <div className="flex items-center mb-6">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-accent/10 rounded-xl mr-4">
+                <Briefcase className="h-6 w-6 text-accent" />
+              </div>
               <h3 className="text-xl font-semibold text-card-foreground">CNAEs Populares</h3>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1">
               {cnaes.map((cnae) => (
                 <a
                   key={cnae.slug}
                   href={`/${cnae.slug}/`}
-                  className="block text-muted-foreground hover:text-accent-foreground transition-smooth p-2 rounded hover:bg-accent"
+                  className="group block text-muted-foreground hover:text-accent transition-all duration-200 p-3 rounded-lg hover:bg-accent/5 border border-transparent hover:border-accent/10"
                 >
-                  <div className="text-sm font-medium">{cnae.nome}</div>
-                  <div className="text-xs text-muted-foreground">{cnae.codigo}</div>
+                  <div className="text-sm font-medium text-card-foreground group-hover:text-accent">{cnae.nome}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{cnae.codigo}</div>
                 </a>
               ))}
             </div>

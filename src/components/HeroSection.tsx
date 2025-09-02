@@ -20,7 +20,7 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="relative bg-gradient-hero py-24 md:py-32 overflow-hidden">
+    <section className="relative bg-gradient-hero py-16 md:py-20 overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-float"></div>
@@ -81,29 +81,29 @@ const HeroSection = () => {
           </div>
 
           {/* Feature highlights */}
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-16 animate-slide-up" style={{animationDelay: '0.6s'}}>
-            <div className="card-modern bg-white/5 backdrop-blur-sm border-white/10 p-6 text-center hover:bg-white/10 transition-all duration-300">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-hero rounded-full mb-4 shadow-glow">
-                <TrendingUp className="h-7 w-7 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12 animate-slide-up" style={{animationDelay: '0.6s'}}>
+            <div className="card-modern bg-white/8 backdrop-blur-md border-white/15 p-8 text-center hover:bg-white/12 transition-all duration-300 hover:scale-105">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/15 backdrop-blur-sm rounded-2xl mb-6 shadow-glow border border-white/20">
+                <TrendingUp className="h-8 w-8 text-white" />
               </div>
-              <h3 className="font-bold text-primary-foreground mb-2 text-lg">Dados Atualizados</h3>
-              <p className="text-primary-foreground/80 text-sm">Informações sempre atualizadas mensalmente da Receita Federal</p>
+              <h3 className="font-bold text-primary-foreground mb-3 text-xl">Dados Atualizados</h3>
+              <p className="text-primary-foreground/85 text-base leading-relaxed">Informações sempre atualizadas mensalmente da Receita Federal</p>
             </div>
             
-            <div className="card-modern bg-white/5 backdrop-blur-sm border-white/10 p-6 text-center hover:bg-white/10 transition-all duration-300">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-hero rounded-full mb-4 shadow-glow">
-                <Shield className="h-7 w-7 text-white" />
+            <div className="card-modern bg-white/8 backdrop-blur-md border-white/15 p-8 text-center hover:bg-white/12 transition-all duration-300 hover:scale-105">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/15 backdrop-blur-sm rounded-2xl mb-6 shadow-glow border border-white/20">
+                <Shield className="h-8 w-8 text-white" />
               </div>
-              <h3 className="font-bold text-primary-foreground mb-2 text-lg">100% Gratuito</h3>
-              <p className="text-primary-foreground/80 text-sm">Consultas ilimitadas sem custo algum. Sempre será gratuito</p>
+              <h3 className="font-bold text-primary-foreground mb-3 text-xl">100% Gratuito</h3>
+              <p className="text-primary-foreground/85 text-base leading-relaxed">Consultas ilimitadas sem custo algum. Sempre será gratuito</p>
             </div>
             
-            <div className="card-modern bg-white/5 backdrop-blur-sm border-white/10 p-6 text-center hover:bg-white/10 transition-all duration-300">
-              <div className="inline-flex items-center justify-center w-14 h-14 bg-gradient-hero rounded-full mb-4 shadow-glow">
-                <Clock className="h-7 w-7 text-white" />
+            <div className="card-modern bg-white/8 backdrop-blur-md border-white/15 p-8 text-center hover:bg-white/12 transition-all duration-300 hover:scale-105">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/15 backdrop-blur-sm rounded-2xl mb-6 shadow-glow border border-white/20">
+                <Clock className="h-8 w-8 text-white" />
               </div>
-              <h3 className="font-bold text-primary-foreground mb-2 text-lg">Consulta Rápida</h3>
-              <p className="text-primary-foreground/80 text-sm">Resultados em segundos com interface moderna e intuitiva</p>
+              <h3 className="font-bold text-primary-foreground mb-3 text-xl">Consulta Rápida</h3>
+              <p className="text-primary-foreground/85 text-base leading-relaxed">Resultados em segundos com interface moderna e intuitiva</p>
             </div>
           </div>
 
