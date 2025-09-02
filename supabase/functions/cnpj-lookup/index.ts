@@ -6,36 +6,43 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface CNPJData {
-  status: string;
+// Interface para a resposta da API Invertexto
+interface InvertextoAPIResponse {
   cnpj: string;
-  razao_social?: string;
-  nome_fantasia?: string;
-  situacao_cadastral?: string;
-  data_situacao_cadastral?: string;
-  natureza_juridica?: string;
-  cnae_principal?: {
+  razao_social: string;
+  nome_fantasia: string;
+  natureza_juridica: string;
+  capital_social: string;
+  data_inicio: string;
+  porte: string;
+  tipo: string;
+  telefone1: string;
+  telefone2?: string;
+  email: string;
+  situacao: {
+    nome: string;
+    data: string;
+    motivo: string;
+  };
+  endereco: {
+    tipo_logradouro: string;
+    logradouro: string;
+    numero: string;
+    complemento: string;
+    bairro: string;
+    cep: string;
+    uf: string;
+    municipio: string;
+  };
+  atividade_principal: {
     codigo: string;
     descricao: string;
   };
-  cnaes_secundarios?: Array<{
+  atividades_secundarias: Array<{
     codigo: string;
     descricao: string;
   }>;
-  endereco?: {
-    logradouro: string;
-    numero: string;
-    complemento?: string;
-    bairro: string;
-    municipio: string;
-    uf: string;
-    cep: string;
-  };
-  telefone?: string;
-  email?: string;
-  data_abertura?: string;
-  regime_tributario?: string;
-  capital_social?: string;
+  status?: string;
 }
 
 function formatCNPJ(cnpj: string): string {
@@ -114,11 +121,11 @@ serve(async (req) => {
     const apiUrl = `https://api.invertexto.com/v1/cnpj/${formattedCNPJ}?token=${apiToken}`;
     
     const response = await fetch(apiUrl);
-    const data: CNPJData = await response.json();
+    const data: InvertextoAPIResponse = await response.json();
 
-    console.log('Resposta da API:', data.status);
+    console.log('Resposta da API:', response.status);
 
-    if (data.status === 'ERROR' || !response.ok) {
+    if (!response.ok || !data.cnpj) {
       return new Response(
         JSON.stringify({ 
           error: 'CNPJ não encontrado ou inválido',
@@ -131,12 +138,44 @@ serve(async (req) => {
       );
     }
 
+    // Normalizar dados da API Invertexto para o formato esperado pelo frontend
+    const normalizedData = {
+      status: 'OK',
+      cnpj: formattedCNPJ,
+      razao_social: data.razao_social,
+      nome_fantasia: data.nome_fantasia,
+      situacao_cadastral: data.situacao.nome,
+      data_situacao_cadastral: data.situacao.data,
+      natureza_juridica: data.natureza_juridica,
+      cnae_principal: {
+        codigo: data.atividade_principal.codigo,
+        descricao: data.atividade_principal.descricao
+      },
+      cnaes_secundarios: data.atividades_secundarias.map((atividade) => ({
+        codigo: atividade.codigo,
+        descricao: atividade.descricao
+      })),
+      endereco: {
+        logradouro: data.endereco.logradouro,
+        numero: data.endereco.numero,
+        complemento: data.endereco.complemento,
+        bairro: data.endereco.bairro,
+        municipio: data.endereco.municipio,
+        uf: data.endereco.uf,
+        cep: data.endereco.cep
+      },
+      telefone: data.telefone1,
+      email: data.email,
+      data_abertura: data.data_inicio,
+      capital_social: data.capital_social
+    };
+
     // Gerar slug para URL amigável
-    const slug = data.razao_social ? generateSlug(data.razao_social, formattedCNPJ) : formattedCNPJ;
+    const slug = normalizedData.razao_social ? generateSlug(normalizedData.razao_social, formattedCNPJ) : formattedCNPJ;
 
     // Retornar dados processados
     const processedData = {
-      ...data,
+      ...normalizedData,
       cnpj_formatado: formattedCNPJ.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5'),
       slug,
       url_path: `/${slug}/`,
