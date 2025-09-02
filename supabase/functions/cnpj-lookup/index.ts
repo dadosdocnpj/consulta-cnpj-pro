@@ -4,7 +4,15 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
 };
+
+// Rate limiting storage
+const requestCounts = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 20;
 
 // Interface para a resposta da API Invertexto
 interface InvertextoAPIResponse {
@@ -45,13 +53,41 @@ interface InvertextoAPIResponse {
   status?: string;
 }
 
+// Rate limiting function
+function checkRateLimit(clientIP: string): boolean {
+  const now = Date.now();
+  const clientData = requestCounts.get(clientIP);
+  
+  if (!clientData || now > clientData.resetTime) {
+    requestCounts.set(clientIP, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (clientData.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+  
+  clientData.count++;
+  return true;
+}
+
+// Enhanced CNPJ validation
 function formatCNPJ(cnpj: string): string {
+  if (!cnpj || typeof cnpj !== 'string') {
+    throw new Error('CNPJ inválido');
+  }
+  
   // Remove todos os caracteres não numéricos
   const cleanCNPJ = cnpj.replace(/\D/g, '');
   
   // Verifica se tem 14 dígitos
   if (cleanCNPJ.length !== 14) {
     throw new Error('CNPJ deve ter 14 dígitos');
+  }
+  
+  // Basic CNPJ validation algorithm
+  if (!/^\d{14}$/.test(cleanCNPJ) || /^(\d)\1{13}$/.test(cleanCNPJ)) {
+    throw new Error('CNPJ com formato inválido');
   }
   
   return cleanCNPJ;
@@ -77,6 +113,25 @@ serve(async (req) => {
   }
 
   try {
+    // Rate limiting based on client IP
+    const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    
+    if (!checkRateLimit(clientIP)) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Muitas requisições. Tente novamente em alguns instantes.' 
+        }),
+        { 
+          status: 429, 
+          headers: { 
+            ...corsHeaders, 
+            'Content-Type': 'application/json',
+            'Retry-After': '60'
+          } 
+        }
+      );
+    }
+
     const { cnpj } = await req.json();
     
     if (!cnpj) {
@@ -117,7 +172,7 @@ serve(async (req) => {
     }
 
     // Consultar API da Invertexto
-    console.log(`Consultando CNPJ: ${formattedCNPJ}`);
+    console.log(`Consultando CNPJ: ${formattedCNPJ.substring(0, 8)}...`);
     const apiUrl = `https://api.invertexto.com/v1/cnpj/${formattedCNPJ}?token=${apiToken}`;
     
     const response = await fetch(apiUrl);
@@ -190,11 +245,21 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Erro na função cnpj-lookup:', error);
+    // Enhanced error logging without exposing sensitive details
+    console.error('Erro na função cnpj-lookup:', {
+      message: error.message,
+      timestamp: new Date().toISOString(),
+      clientIP: req.headers.get('x-forwarded-for') || 'unknown'
+    });
+    
+    // Generic error message to prevent information disclosure
+    const safeErrorMessage = error.message.includes('CNPJ') || error.message.includes('formato')
+      ? 'CNPJ inválido ou não encontrado'
+      : 'Serviço temporariamente indisponível';
+    
     return new Response(
       JSON.stringify({ 
-        error: 'Erro interno do servidor',
-        details: error.message 
+        error: safeErrorMessage
       }),
       { 
         status: 500, 

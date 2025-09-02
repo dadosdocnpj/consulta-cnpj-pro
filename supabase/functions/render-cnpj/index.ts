@@ -5,7 +5,17 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'",
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
 };
+
+// Rate limiting storage
+const requestCounts = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 10;
 
 // Interface para dados do CNPJ
 interface CNPJData {
@@ -47,26 +57,83 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// HTML sanitization function
+function escapeHtml(unsafe: string): string {
+  if (typeof unsafe !== 'string') return '';
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// Enhanced CNPJ validation
 function formatCNPJ(cnpj: string): string {
+  if (!cnpj || typeof cnpj !== 'string') {
+    throw new Error('CNPJ inválido');
+  }
+  
   const cleaned = cnpj.replace(/\D/g, '');
   
   if (cleaned.length !== 14) {
     throw new Error('CNPJ deve conter exatamente 14 dígitos');
   }
   
+  // Basic CNPJ validation algorithm
+  if (!/^\d{14}$/.test(cleaned) || /^(\d)\1{13}$/.test(cleaned)) {
+    throw new Error('CNPJ com formato inválido');
+  }
+  
   return cleaned;
 }
 
+// Rate limiting function
+function checkRateLimit(clientIP: string): boolean {
+  const now = Date.now();
+  const clientData = requestCounts.get(clientIP);
+  
+  if (!clientData || now > clientData.resetTime) {
+    requestCounts.set(clientIP, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (clientData.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+  
+  clientData.count++;
+  return true;
+}
+
 function generateSlug(razaoSocial: string, cnpj: string): string {
-  const normalizedName = razaoSocial
+  if (!razaoSocial || !cnpj) return '';
+  
+  const sanitizedRazaoSocial = escapeHtml(razaoSocial);
+  const normalizedName = sanitizedRazaoSocial
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9\s]/g, '')
     .replace(/\s+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/^-+|-+$/g, '')
+    .substring(0, 100); // Limit length
     
   return `${cnpj}-${normalizedName}`;
+}
+
+// Validate slug format
+function validateSlug(slug: string): boolean {
+  if (!slug || typeof slug !== 'string') return false;
+  
+  // Check for potential injection attempts
+  if (slug.includes('<') || slug.includes('>') || slug.includes('&') || 
+      slug.includes('"') || slug.includes("'") || slug.includes('script')) {
+    return false;
+  }
+  
+  // Must start with 14 digits followed by hyphen
+  return /^(\d{14})-[a-z0-9\-]{1,100}$/.test(slug);
 }
 
 function formatCNPJDisplay(cnpj: string): string {
@@ -84,25 +151,36 @@ function formatDate(dateStr: string): string {
 
 function generateHTML(data: CNPJData): string {
   const cnpjFormatted = formatCNPJDisplay(data.cnpj);
-  const title = `${data.razao_social || 'Empresa'} - CNPJ: ${cnpjFormatted}`;
-  const description = `Consulte os dados de ${data.razao_social || 'empresa'}, CNPJ ${cnpjFormatted}, em ${data.endereco?.municipio || ''}-${data.endereco?.uf || ''}. Atividade: ${data.cnae_principal?.descricao || 'Não informado'}.`;
+  
+  // Sanitize all user data before including in HTML
+  const safeRazaoSocial = escapeHtml(data.razao_social || 'Empresa');
+  const safeNomeFantasia = data.nome_fantasia ? escapeHtml(data.nome_fantasia) : null;
+  const safeNaturezaJuridica = data.natureza_juridica ? escapeHtml(data.natureza_juridica) : null;
+  const safeSituacaoCadastral = data.situacao_cadastral ? escapeHtml(data.situacao_cadastral) : null;
+  const safeDataAbertura = data.data_abertura ? escapeHtml(data.data_abertura) : null;
+  const safeCapitalSocial = data.capital_social ? escapeHtml(data.capital_social) : null;
+  const safeTelefone = data.telefone ? escapeHtml(data.telefone) : null;
+  const safeEmail = data.email ? escapeHtml(data.email) : null;
+  
+  const title = `${safeRazaoSocial} - CNPJ: ${cnpjFormatted}`;
+  const description = `Consulte os dados de ${safeRazaoSocial}, CNPJ ${cnpjFormatted}, em ${data.endereco?.municipio ? escapeHtml(data.endereco.municipio) : ''}-${data.endereco?.uf ? escapeHtml(data.endereco.uf) : ''}. Atividade: ${data.cnae_principal?.descricao ? escapeHtml(data.cnae_principal.descricao) : 'Não informado'}.`;
   
   const schemaOrg = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": data.razao_social || "Empresa",
+    "name": safeRazaoSocial,
     "identifier": cnpjFormatted,
     "address": data.endereco ? {
       "@type": "PostalAddress",
-      "streetAddress": `${data.endereco.logradouro}, ${data.endereco.numero}`,
-      "addressLocality": data.endereco.municipio,
-      "addressRegion": data.endereco.uf,
-      "postalCode": data.endereco.cep,
+      "streetAddress": `${escapeHtml(data.endereco.logradouro || '')}, ${escapeHtml(data.endereco.numero || '')}`,
+      "addressLocality": escapeHtml(data.endereco.municipio || ''),
+      "addressRegion": escapeHtml(data.endereco.uf || ''),
+      "postalCode": escapeHtml(data.endereco.cep || ''),
       "addressCountry": "BR"
     } : undefined,
-    "foundingDate": data.data_abertura,
-    "email": data.email,
-    "telephone": data.telefone
+    "foundingDate": safeDataAbertura,
+    "email": safeEmail,
+    "telephone": safeTelefone
   };
 
   return `<!DOCTYPE html>
@@ -148,38 +226,38 @@ function generateHTML(data: CNPJData): string {
 </head>
 <body>
   <div class="header">
-    <h1>${data.razao_social || 'Empresa'}</h1>
+    <h1>${safeRazaoSocial}</h1>
     <div class="cnpj">CNPJ: ${cnpjFormatted}</div>
-    ${data.situacao_cadastral ? `<span class="badge ${data.situacao_cadastral.toLowerCase().includes('ativa') ? '' : 'inactive'}">${data.situacao_cadastral}</span>` : ''}
+    ${safeSituacaoCadastral ? `<span class="badge ${safeSituacaoCadastral.toLowerCase().includes('ativa') ? '' : 'inactive'}">${safeSituacaoCadastral}</span>` : ''}
   </div>
 
   <main>
     <section class="card">
       <h2>Informações Básicas</h2>
       <div class="info-grid">
-        ${data.razao_social ? `<div class="info-item">
+        ${safeRazaoSocial && safeRazaoSocial !== 'Empresa' ? `<div class="info-item">
           <span class="info-label">Razão Social</span>
-          <div class="info-value">${data.razao_social}</div>
+          <div class="info-value">${safeRazaoSocial}</div>
         </div>` : ''}
         
-        ${data.nome_fantasia && data.nome_fantasia !== data.razao_social ? `<div class="info-item">
+        ${safeNomeFantasia && safeNomeFantasia !== safeRazaoSocial ? `<div class="info-item">
           <span class="info-label">Nome Fantasia</span>
-          <div class="info-value">${data.nome_fantasia}</div>
+          <div class="info-value">${safeNomeFantasia}</div>
         </div>` : ''}
         
-        ${data.natureza_juridica ? `<div class="info-item">
+        ${safeNaturezaJuridica ? `<div class="info-item">
           <span class="info-label">Natureza Jurídica</span>
-          <div class="info-value">${data.natureza_juridica}</div>
+          <div class="info-value">${safeNaturezaJuridica}</div>
         </div>` : ''}
         
-        ${data.data_abertura ? `<div class="info-item">
+        ${safeDataAbertura ? `<div class="info-item">
           <span class="info-label">Data de Abertura</span>
-          <div class="info-value">${formatDate(data.data_abertura)}</div>
+          <div class="info-value">${formatDate(safeDataAbertura)}</div>
         </div>` : ''}
         
-        ${data.capital_social ? `<div class="info-item">
+        ${safeCapitalSocial ? `<div class="info-item">
           <span class="info-label">Capital Social</span>
-          <div class="info-value">R$ ${data.capital_social}</div>
+          <div class="info-value">R$ ${safeCapitalSocial}</div>
         </div>` : ''}
       </div>
     </section>
@@ -189,34 +267,34 @@ function generateHTML(data: CNPJData): string {
       <address>
         <div class="info-item">
           <span class="info-label">Logradouro</span>
-          <div class="info-value">${data.endereco.logradouro}, ${data.endereco.numero}${data.endereco.complemento ? ` - ${data.endereco.complemento}` : ''}</div>
+          <div class="info-value">${escapeHtml(data.endereco.logradouro || '')}, ${escapeHtml(data.endereco.numero || '')}${data.endereco.complemento ? ` - ${escapeHtml(data.endereco.complemento)}` : ''}</div>
         </div>
         <div class="info-item">
           <span class="info-label">Bairro</span>
-          <div class="info-value">${data.endereco.bairro}</div>
+          <div class="info-value">${escapeHtml(data.endereco.bairro || '')}</div>
         </div>
         <div class="info-item">
           <span class="info-label">Município/UF</span>
-          <div class="info-value">${data.endereco.municipio} - ${data.endereco.uf}</div>
+          <div class="info-value">${escapeHtml(data.endereco.municipio || '')} - ${escapeHtml(data.endereco.uf || '')}</div>
         </div>
         <div class="info-item">
           <span class="info-label">CEP</span>
-          <div class="info-value">${data.endereco.cep}</div>
+          <div class="info-value">${escapeHtml(data.endereco.cep || '')}</div>
         </div>
       </address>
     </section>` : ''}
 
-    ${(data.telefone || data.email) ? `<section class="card">
+    ${(safeTelefone || safeEmail) ? `<section class="card">
       <h2>Contato</h2>
       <div class="info-grid">
-        ${data.telefone ? `<div class="info-item">
+        ${safeTelefone ? `<div class="info-item">
           <span class="info-label">Telefone</span>
-          <div class="info-value">${data.telefone}</div>
+          <div class="info-value">${safeTelefone}</div>
         </div>` : ''}
         
-        ${data.email ? `<div class="info-item">
+        ${safeEmail ? `<div class="info-item">
           <span class="info-label">Email</span>
-          <div class="info-value">${data.email}</div>
+          <div class="info-value">${safeEmail}</div>
         </div>` : ''}
       </div>
     </section>` : ''}
@@ -226,7 +304,7 @@ function generateHTML(data: CNPJData): string {
       <div class="info-item">
         <span class="info-label">CNAE Principal</span>
         <div class="info-value">
-          <strong>${data.cnae_principal.codigo}</strong> - ${data.cnae_principal.descricao}
+          <strong>${escapeHtml(data.cnae_principal.codigo || '')}</strong> - ${escapeHtml(data.cnae_principal.descricao || '')}
         </div>
       </div>
       
@@ -234,7 +312,7 @@ function generateHTML(data: CNPJData): string {
         <div class="info-item" style="margin-top: 20px;">
           <span class="info-label">CNAEs Secundários</span>
           <div class="info-value">
-            ${data.cnaes_secundarios.map(cnae => `<div><strong>${cnae.codigo}</strong> - ${cnae.descricao}</div>`).join('')}
+            ${data.cnaes_secundarios.map(cnae => `<div><strong>${escapeHtml(cnae.codigo || '')}</strong> - ${escapeHtml(cnae.descricao || '')}</div>`).join('')}
           </div>
         </div>
       ` : ''}
@@ -307,18 +385,40 @@ serve(async (req) => {
   }
 
   try {
+    // Rate limiting based on client IP
+    const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    
+    if (!checkRateLimit(clientIP)) {
+      return new Response('Too Many Requests', { 
+        status: 429,
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'text/plain',
+          'Retry-After': '60'
+        }
+      });
+    }
+
     // Extrair slug da URL (/functions/v1/render-cnpj/28812425000114-empresa-nome)
     const pathParts = url.pathname.split('/');
     const slug = pathParts[pathParts.length - 1];
     
     if (!slug || slug === 'render-cnpj') {
-      return new Response('Slug não fornecido', { 
+      return new Response('Recurso não encontrado', { 
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'text/plain' }
       });
     }
 
-    console.log(`Renderizando página para slug: ${slug}`);
+    // Validate slug format for security
+    if (!validateSlug(slug)) {
+      return new Response('Parâmetro inválido', { 
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'text/plain' }
+      });
+    }
+
+    console.log(`Renderizando página para slug validado: ${slug.substring(0, 20)}...`);
 
     // Verificar se existe no cache primeiro
     const { data: cached } = await supabase
@@ -339,16 +439,16 @@ serve(async (req) => {
       });
     }
 
-    // Extrair CNPJ do slug
+    // Extrair e validar CNPJ do slug
     const cnpjMatch = slug.match(/^(\d{14})/);
     if (!cnpjMatch) {
-      return new Response('Formato de slug inválido', { 
+      return new Response('Formato inválido', { 
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'text/plain' }
       });
     }
 
-    const cnpj = cnpjMatch[1];
+    const cnpj = formatCNPJ(cnpjMatch[1]); // This will validate the CNPJ
     
     // Buscar dados do CNPJ
     const cnpjData = await getCNPJData(cnpj);
@@ -370,7 +470,17 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Erro na renderização:', error);
+    // Enhanced error logging without exposing sensitive details
+    console.error('Erro na renderização:', {
+      message: error.message,
+      timestamp: new Date().toISOString(),
+      clientIP: req.headers.get('x-forwarded-for') || 'unknown'
+    });
+    
+    // Generic error message to prevent information disclosure
+    const safeErrorMessage = error.message.includes('CNPJ') 
+      ? 'Dados da empresa não encontrados' 
+      : 'Serviço temporariamente indisponível';
     
     // Retornar página de erro em HTML
     const errorHTML = `<!DOCTYPE html>
@@ -379,10 +489,11 @@ serve(async (req) => {
   <title>Erro - Consulta CNPJ</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
 </head>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px;">
   <h1>Erro na Consulta</h1>
-  <p>Não foi possível carregar os dados da empresa. ${error.message}</p>
+  <p>${escapeHtml(safeErrorMessage)}</p>
   <a href="/" style="color: #059669;">← Voltar para busca</a>
 </body>
 </html>`;
