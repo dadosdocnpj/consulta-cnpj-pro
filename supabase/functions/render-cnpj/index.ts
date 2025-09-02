@@ -197,7 +197,7 @@ function generateHTML(data: CNPJData): string {
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description}" />
-  <link rel="canonical" href="https://ayyklhshzzfkutkrpipj.supabase.co/functions/v1/render-cnpj/${data.slug}" />
+  <link rel="canonical" href="https://dadosdocnpj.com.br/${data.slug}/" />
   <script type="application/ld+json">
     ${JSON.stringify(schemaOrg, null, 2)}
   </script>

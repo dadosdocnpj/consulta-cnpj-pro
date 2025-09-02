@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCNPJBySlug } from '@/hooks/useCNPJBySlug';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,6 +31,20 @@ import { Helmet } from 'react-helmet-async';
 const CNPJPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, isError, error } = useCNPJBySlug(slug || '');
+
+  // Bot detection for SEO
+  useEffect(() => {
+    if (slug && typeof window !== 'undefined') {
+      const userAgent = navigator.userAgent.toLowerCase();
+      const isBotUserAgent = /bot|crawl|spider|scraper|facebookexternalhit|twitterbot|slurp|linkedinbot|whatsapp|telegrambot|skypeuri|semrushbot|ahrefsbot|mj12bot/i.test(userAgent);
+      
+      if (isBotUserAgent) {
+        // Redirect bots to the Edge Function for SSR
+        window.location.href = `https://ayyklhshzzfkutkrpipj.supabase.co/functions/v1/render-cnpj/${slug}`;
+        return;
+      }
+    }
+  }, [slug]);
 
   if (isLoading) {
     return (
