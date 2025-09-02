@@ -1,4 +1,7 @@
 import { ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
+
+const logoImage = "/lovable-uploads/d54f0af5-d59b-4d5e-9876-ba7766fd200c.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -9,9 +12,13 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="md:col-span-2">
-            <h3 className="text-xl font-bold text-foreground mb-4">
-              dadosdocnpj.com.br
-            </h3>
+            <Link to="/" className="inline-block mb-4 hover:opacity-80 transition-smooth">
+              <img 
+                src={logoImage} 
+                alt="Dados do CNPJ - Portal de consulta empresarial" 
+                className="h-10 w-auto object-contain filter brightness-0 dark:brightness-100"
+              />
+            </Link>
             <p className="text-muted-foreground mb-4 max-w-md">
               A maior plataforma gratuita de consulta CNPJ do Brasil. 
               Acesse informações oficiais de milhões de empresas de forma 
