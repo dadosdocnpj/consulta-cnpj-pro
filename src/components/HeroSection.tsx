@@ -1,24 +1,54 @@
-import { Search, TrendingUp, Shield, Clock, Sparkles } from "lucide-react";
+import { Search, TrendingUp, Shield, Clock, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCNPJLookup } from "@/hooks/useCNPJLookup";
+import { isValidCNPJFormat, normalizeCNPJInput, formatCNPJ } from "@/utils/cnpj";
 
 const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isValidInput, setIsValidInput] = useState(true);
+  const navigate = useNavigate();
+  const { lookupCNPJ, isLoading, data, isSuccess } = useCNPJLookup();
+
+  const validateInput = (input: string) => {
+    if (!input.trim()) return true;
+    
+    const normalized = normalizeCNPJInput(input);
+    if (normalized.type === 'cnpj') {
+      return isValidCNPJFormat(normalized.value);
+    }
+    return true; // Nomes de empresa são sempre válidos
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setIsValidInput(validateInput(value));
+  };
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     
-    try {
-      console.log("Buscando CNPJ:", searchQuery);
-      // Por enquanto só logamos - implementaremos a busca real na próxima etapa
-    } catch (error) {
-      console.error("Erro na busca:", error);
+    if (!validateInput(searchQuery)) {
+      setIsValidInput(false);
+      return;
     }
+
+    const normalized = normalizeCNPJInput(searchQuery);
+    lookupCNPJ({ cnpj: normalized.value });
   };
 
+  // Redirecionar quando a busca for bem-sucedida
+  useEffect(() => {
+    if (isSuccess && data?.success && data.path) {
+      navigate(data.path);
+    }
+  }, [isSuccess, data, navigate]);
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !isLoading && searchQuery.trim() && isValidInput) {
       handleSearch();
     }
   };
@@ -60,26 +90,52 @@ const HeroSection = () => {
                   type="text"
                   placeholder="Ex: Petrobras, 11.222.333/0001-81 ou Magazine Luiza"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
-                  className="pl-12 h-16 text-lg bg-white border-2 border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl font-medium text-gray-900 placeholder:text-gray-500"
+                  className={`pl-12 h-16 text-lg bg-white border-2 ${
+                    !isValidInput 
+                      ? 'border-destructive focus:border-destructive focus:ring-destructive/20' 
+                      : 'border-input focus:border-primary focus:ring-primary/20'
+                  } rounded-xl font-medium text-foreground placeholder:text-muted-foreground search-glow transition-all duration-300`}
                 />
               </div>
               <Button
                 onClick={handleSearch}
+                disabled={isLoading || !searchQuery.trim() || !isValidInput}
                 variant="hero"
                 size="lg"
                 className="h-16 px-10 text-lg font-bold rounded-xl"
               >
-                <Search className="h-5 w-5 mr-2" />
-                Buscar Agora
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Buscando...
+                  </>
+                ) : (
+                  <>
+                    <Search className="h-5 w-5 mr-2" />
+                    Buscar Agora
+                  </>
+                )}
               </Button>
             </div>
             
-            <p className="text-gray-600 text-sm mt-4">
-              Exemplo: <span className="text-primary font-semibold">11.222.333/0001-81</span> ou{" "}
-              <span className="text-primary font-semibold">"Petrobras"</span> ou{" "}
-              <span className="text-primary font-semibold">"Banco do Brasil"</span>
+            <p className={`text-sm mt-4 transition-colors duration-200 ${
+              !isValidInput 
+                ? 'text-destructive' 
+                : 'text-muted-foreground'
+            }`}>
+              {!isValidInput ? (
+                <>
+                  <strong>CNPJ inválido:</strong> Digite um CNPJ com 14 dígitos ou o nome da empresa
+                </>
+              ) : (
+                <>
+                  Exemplo: <span className="text-primary font-semibold">11.222.333/0001-81</span> ou{" "}
+                  <span className="text-primary font-semibold">"Petrobras"</span> ou{" "}
+                  <span className="text-primary font-semibold">"Banco do Brasil"</span>
+                </>
+              )}
             </p>
           </div>
 

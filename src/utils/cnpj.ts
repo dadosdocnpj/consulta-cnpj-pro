@@ -1,0 +1,84 @@
+/**
+ * Remove todos os caracteres não numéricos do CNPJ
+ */
+export const cleanCNPJ = (cnpj: string): string => {
+  return cnpj.replace(/\D/g, '');
+};
+
+/**
+ * Formata o CNPJ com pontuação
+ */
+export const formatCNPJ = (cnpj: string): string => {
+  const cleaned = cleanCNPJ(cnpj);
+  
+  if (cleaned.length !== 14) {
+    return cnpj; // Retorna como está se não tiver 14 dígitos
+  }
+  
+  return cleaned.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+};
+
+/**
+ * Valida se o CNPJ tem formato válido (14 dígitos)
+ */
+export const isValidCNPJFormat = (cnpj: string): boolean => {
+  const cleaned = cleanCNPJ(cnpj);
+  return cleaned.length === 14 && /^\d{14}$/.test(cleaned);
+};
+
+/**
+ * Valida dígito verificador do CNPJ
+ */
+export const isValidCNPJ = (cnpj: string): boolean => {
+  const cleaned = cleanCNPJ(cnpj);
+  
+  if (!isValidCNPJFormat(cleaned)) {
+    return false;
+  }
+
+  // Elimina CNPJs conhecidos como inválidos
+  if (/^(\d)\1{13}$/.test(cleaned)) {
+    return false;
+  }
+
+  // Valida DVs
+  let size = cleaned.length - 2;
+  let numbers = cleaned.substring(0, size);
+  const digits = cleaned.substring(size);
+  let sum = 0;
+  let pos = size - 7;
+
+  for (let i = size; i >= 1; i--) {
+    sum += parseInt(numbers.charAt(size - i)) * pos--;
+    if (pos < 2) pos = 9;
+  }
+
+  let result = sum % 11 < 2 ? 0 : 11 - sum % 11;
+  if (result !== parseInt(digits.charAt(0))) return false;
+
+  size = size + 1;
+  numbers = cleaned.substring(0, size);
+  sum = 0;
+  pos = size - 7;
+
+  for (let i = size; i >= 1; i--) {
+    sum += parseInt(numbers.charAt(size - i)) * pos--;
+    if (pos < 2) pos = 9;
+  }
+
+  result = sum % 11 < 2 ? 0 : 11 - sum % 11;
+  return result === parseInt(digits.charAt(1));
+};
+
+/**
+ * Normaliza entrada de CNPJ (aceita nome da empresa ou CNPJ)
+ */
+export const normalizeCNPJInput = (input: string): { type: 'cnpj' | 'name', value: string } => {
+  const cleaned = cleanCNPJ(input);
+  
+  if (cleaned.length === 14 && /^\d{14}$/.test(cleaned)) {
+    return { type: 'cnpj', value: cleaned };
+  }
+  
+  return { type: 'name', value: input.trim() };
+};
