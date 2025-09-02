@@ -42,8 +42,8 @@ const HeroSection = () => {
 
   // Redirecionar quando a busca for bem-sucedida
   useEffect(() => {
-    if (isSuccess && data?.success && data.path) {
-      navigate(data.path);
+    if (isSuccess && data?.status === 'OK' && data?.url_path) {
+      navigate(data.url_path);
     }
   }, [isSuccess, data, navigate]);
 

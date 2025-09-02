@@ -1,51 +1,40 @@
 export interface CNPJData {
+  status: string;
   cnpj: string;
-  tipo: string;
-  porte: string;
-  nome: string;
-  fantasia: string;
-  abertura: string;
-  atividade_principal: Array<{
-    code: string;
-    text: string;
+  razao_social?: string;
+  nome_fantasia?: string;
+  situacao_cadastral?: string;
+  data_situacao_cadastral?: string;
+  natureza_juridica?: string;
+  cnae_principal?: {
+    codigo: string;
+    descricao: string;
+  };
+  cnaes_secundarios?: Array<{
+    codigo: string;
+    descricao: string;
   }>;
-  atividades_secundarias: Array<{
-    code: string;
-    text: string;
-  }>;
-  natureza_juridica: string;
-  logradouro: string;
-  numero: string;
-  complemento: string;
-  cep: string;
-  bairro: string;
-  municipio: string;
-  uf: string;
-  email: string;
-  telefone: string;
-  efr: string;
-  situacao: string;
-  data_situacao: string;
-  motivo_situacao: string;
-  situacao_especial: string;
-  data_situacao_especial: string;
-  capital_social: string;
-  qsa: Array<{
-    nome: string;
-    qual: string;
-    pais_origem: string;
-    nome_rep_legal: string;
-    qual_rep_legal: string;
-  }>;
+  endereco?: {
+    logradouro: string;
+    numero: string;
+    complemento?: string;
+    bairro: string;
+    municipio: string;
+    uf: string;
+    cep: string;
+  };
+  telefone?: string;
+  email?: string;
+  data_abertura?: string;
+  regime_tributario?: string;
+  capital_social?: string;
+  cnpj_formatado?: string;
+  slug?: string;
+  url_path?: string;
 }
 
-export interface CNPJLookupResponse {
-  success: boolean;
-  data?: CNPJData;
-  formattedCnpj?: string;
-  slug?: string;
-  path?: string;
-  error?: string;
+export interface CNPJLookupResponse extends CNPJData {
+  // Herda todos os campos de CNPJData
 }
 
 export interface CNPJLookupRequest {

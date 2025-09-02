@@ -17,8 +17,8 @@ export const useCNPJLookup = () => {
           throw new Error(error.message || 'Erro ao consultar CNPJ');
         }
 
-        if (!data || !data.success) {
-          throw new Error(data?.error || 'Erro desconhecido na consulta');
+        if (!data || data.status === 'ERROR') {
+          throw new Error('CNPJ não encontrado ou inválido');
         }
 
         return data as CNPJLookupResponse;
@@ -28,10 +28,10 @@ export const useCNPJLookup = () => {
       }
     },
     onSuccess: (data) => {
-      if (data.success) {
+      if (data.status === 'OK') {
         toast({
           title: "Empresa encontrada!",
-          description: `Dados de ${data.data?.nome || 'empresa'} carregados com sucesso.`,
+          description: `Dados de ${data.razao_social || 'empresa'} carregados com sucesso.`,
         });
       }
     },

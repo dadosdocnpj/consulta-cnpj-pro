@@ -139,7 +139,8 @@ serve(async (req) => {
       ...data,
       cnpj_formatado: formattedCNPJ.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5'),
       slug,
-      url_path: `/${slug}/`
+      url_path: `/${slug}/`,
+      path: `/${slug}/`
     };
 
     return new Response(
