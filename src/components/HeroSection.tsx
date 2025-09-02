@@ -6,10 +6,14 @@ import { useState } from "react";
 const HeroSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      // Future: implement search logic
-      console.log("Searching for:", searchQuery);
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    try {
+      console.log("Buscando CNPJ:", searchQuery);
+      // Por enquanto só logamos - implementaremos a busca real na próxima etapa
+    } catch (error) {
+      console.error("Erro na busca:", error);
     }
   };
 
