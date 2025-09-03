@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+import ExecuteImport from "./pages/ExecuteImport";
 import EstadosPage from "./pages/EstadosPage";
 import CidadesPage from "./pages/CidadesPage";
 import EmpresasPorCidadePage from "./pages/EmpresasPorCidadePage";
@@ -16,6 +16,7 @@ import TopEmpresasPage from "./pages/TopEmpresasPage";
 import EmpresasRecentesPage from "./pages/EmpresasRecentesPage";
 import StartupsPage from "./pages/StartupsPage";
 import EmpresasPublicasPage from "./pages/EmpresasPublicasPage";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/empresas-recentes" element={<EmpresasRecentesPage />} />
             <Route path="/categoria/startups" element={<StartupsPage />} />
             <Route path="/categoria/publicas" element={<EmpresasPublicasPage />} />
+            <Route path="/admin/import" element={<ExecuteImport />} />
             <Route path="/:slug" element={<Index />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
