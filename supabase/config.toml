@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.populate-cnpj-cache]
 verify_jwt = false
+
+[functions.empresa-search]
+verify_jwt = false
