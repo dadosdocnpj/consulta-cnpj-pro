@@ -15,7 +15,7 @@ export const useEmpresasPorCidade = (uf: string, cidade: string, page: number = 
           .from('cnpj_cache')
           .select('json_data', { count: 'exact' })
           .eq('json_data->endereco->>uf', uf.toUpperCase())
-          .eq('json_data->endereco->>municipio', cidade.toUpperCase())
+          .ilike('json_data->endereco->>municipio', cidade.toUpperCase())
           .range((page - 1) * limit, page * limit - 1)
           .order('created_at', { ascending: false });
 

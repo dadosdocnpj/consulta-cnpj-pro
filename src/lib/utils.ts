@@ -30,18 +30,23 @@ export const createCitySlug = (cityName: string): string => {
 
 /**
  * Converte um slug de volta para nome de cidade para busca no banco
- * Tenta primeiro como slug, depois como nome original
+ * Remove acentos e normaliza para compatibilidade com dados do banco
  */
 export const parseCityFromSlug = (slug: string): string => {
   if (!slug) return '';
   
+  let cityName = '';
+  
   // Se for um slug (contém hífens e está em minúsculo), converte de volta
   if (slug.includes('-') && slug === slug.toLowerCase()) {
-    return slug.split('-').map(word => 
+    cityName = slug.split('-').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
+  } else {
+    // Senão, retorna como está (compatibilidade com URLs antigas)
+    cityName = decodeURIComponent(slug);
   }
   
-  // Senão, retorna como está (compatibilidade com URLs antigas)
-  return decodeURIComponent(slug);
+  // Remove acentos para compatibilidade com dados do banco
+  return removeAccents(cityName);
 };
