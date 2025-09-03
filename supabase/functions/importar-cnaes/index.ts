@@ -304,7 +304,7 @@ async function importarCNAEs() {
 
   try {
     // 1. Importar seções
-    console.log('Importando seções CNAEs...');
+    console.log(`Importando ${secoesCNAE.length} seções CNAEs...`);
     for (const secao of secoesCNAE) {
       try {
         const { error } = await supabase
@@ -315,6 +315,7 @@ async function importarCNAEs() {
           console.error(`Erro ao importar seção ${secao.codigo}:`, error);
           erros++;
         } else {
+          console.log(`✅ Seção ${secao.codigo} importada com sucesso`);
           importados++;
         }
       } catch (err) {
@@ -324,15 +325,21 @@ async function importarCNAEs() {
     }
 
     // 2. Importar divisões
-    console.log('Importando divisões CNAEs...');
+    console.log(`Importando ${divisoesCNAE.length} divisões CNAEs...`);
     for (const divisao of divisoesCNAE) {
       try {
         // Buscar ID da seção
-        const { data: secao } = await supabase
+        const { data: secao, error: secaoError } = await supabase
           .from('cnaes_secoes')
           .select('id')
           .eq('codigo', divisao.secao_codigo)
           .single();
+
+        if (secaoError) {
+          console.error(`❌ Seção ${divisao.secao_codigo} não encontrada para divisão ${divisao.codigo}:`, secaoError);
+          erros++;
+          continue;
+        }
 
         if (secao) {
           const { error } = await supabase
@@ -349,8 +356,12 @@ async function importarCNAEs() {
             console.error(`Erro ao importar divisão ${divisao.codigo}:`, error);
             erros++;
           } else {
+            console.log(`✅ Divisão ${divisao.codigo} importada com sucesso`);
             importados++;
           }
+        } else {
+          console.error(`❌ Seção ${divisao.secao_codigo} não encontrada para divisão ${divisao.codigo}`);
+          erros++;
         }
       } catch (err) {
         console.error(`Erro ao processar divisão ${divisao.codigo}:`, err);
@@ -359,15 +370,21 @@ async function importarCNAEs() {
     }
 
     // 3. Importar grupos
-    console.log('Importando grupos CNAEs...');
+    console.log(`Importando ${gruposCNAE.length} grupos CNAEs...`);
     for (const grupo of gruposCNAE) {
       try {
         // Buscar ID da divisão
-        const { data: divisao } = await supabase
+        const { data: divisao, error: divisaoError } = await supabase
           .from('cnaes_divisoes')
           .select('id')
           .eq('codigo', grupo.divisao_codigo)
           .single();
+
+        if (divisaoError) {
+          console.error(`❌ Divisão ${grupo.divisao_codigo} não encontrada para grupo ${grupo.codigo}:`, divisaoError);
+          erros++;
+          continue;
+        }
 
         if (divisao) {
           const { error } = await supabase
@@ -384,8 +401,12 @@ async function importarCNAEs() {
             console.error(`Erro ao importar grupo ${grupo.codigo}:`, error);
             erros++;
           } else {
+            console.log(`✅ Grupo ${grupo.codigo} importado com sucesso`);
             importados++;
           }
+        } else {
+          console.error(`❌ Divisão ${grupo.divisao_codigo} não encontrada para grupo ${grupo.codigo}`);
+          erros++;
         }
       } catch (err) {
         console.error(`Erro ao processar grupo ${grupo.codigo}:`, err);
@@ -394,15 +415,21 @@ async function importarCNAEs() {
     }
 
     // 4. Importar classes
-    console.log('Importando classes CNAEs...');
+    console.log(`Importando ${classesCNAE.length} classes CNAEs...`);
     for (const classe of classesCNAE) {
       try {
         // Buscar ID do grupo
-        const { data: grupo } = await supabase
+        const { data: grupo, error: grupoError } = await supabase
           .from('cnaes_grupos')
           .select('id')
           .eq('codigo', classe.grupo_codigo)
           .single();
+
+        if (grupoError) {
+          console.error(`❌ Grupo ${classe.grupo_codigo} não encontrado para classe ${classe.codigo}:`, grupoError);
+          erros++;
+          continue;
+        }
 
         if (grupo) {
           const { error } = await supabase
@@ -419,8 +446,12 @@ async function importarCNAEs() {
             console.error(`Erro ao importar classe ${classe.codigo}:`, error);
             erros++;
           } else {
+            console.log(`✅ Classe ${classe.codigo} importada com sucesso`);
             importados++;
           }
+        } else {
+          console.error(`❌ Grupo ${classe.grupo_codigo} não encontrado para classe ${classe.codigo}`);
+          erros++;
         }
       } catch (err) {
         console.error(`Erro ao processar classe ${classe.codigo}:`, err);
@@ -429,15 +460,21 @@ async function importarCNAEs() {
     }
 
     // 5. Importar subclasses
-    console.log('Importando subclasses CNAEs...');
+    console.log(`Importando ${subclassesCNAE.length} subclasses CNAEs...`);
     for (const subclasse of subclassesCNAE) {
       try {
         // Buscar ID da classe
-        const { data: classe } = await supabase
+        const { data: classe, error: classeError } = await supabase
           .from('cnaes_classes')
           .select('id')
           .eq('codigo', subclasse.classe_codigo)
           .single();
+
+        if (classeError) {
+          console.error(`❌ Classe ${subclasse.classe_codigo} não encontrada para subclasse ${subclasse.codigo}:`, classeError);
+          erros++;
+          continue;
+        }
 
         if (classe) {
           const { error } = await supabase
@@ -455,8 +492,12 @@ async function importarCNAEs() {
             console.error(`Erro ao importar subclasse ${subclasse.codigo}:`, error);
             erros++;
           } else {
+            console.log(`✅ Subclasse ${subclasse.codigo} importada com sucesso`);
             importados++;
           }
+        } else {
+          console.error(`❌ Classe ${subclasse.classe_codigo} não encontrada para subclasse ${subclasse.codigo}`);
+          erros++;
         }
       } catch (err) {
         console.error(`Erro ao processar subclasse ${subclasse.codigo}:`, err);
