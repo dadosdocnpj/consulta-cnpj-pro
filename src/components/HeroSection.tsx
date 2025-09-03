@@ -27,10 +27,6 @@ const HeroSection = () => {
             <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed max-w-4xl mx-auto drop-shadow-sm">
               Encontre informações completas de qualquer empresa registrada no Brasil: razão social, nome fantasia, endereço, CNAEs, sócios, situação cadastral e muito mais. Dados atualizados diretamente da Receita Federal.
             </p>
-            
-            <p className="text-base md:text-lg text-white/80 mb-8 leading-relaxed max-w-2xl mx-auto drop-shadow-sm">
-              🔎 Digite o CNPJ ou nome da empresa e comece sua consulta agora mesmo.
-            </p>
           </div>
 
           {/* Main Search Card */}
