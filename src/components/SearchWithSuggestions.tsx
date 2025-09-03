@@ -2,7 +2,7 @@ import { Search, Loader2, Building2, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCNPJLookup } from "@/hooks/useCNPJLookup";
 import { useEmpresaSearch } from "@/hooks/useEmpresaSearch";
@@ -25,7 +25,9 @@ const SearchWithSuggestions = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isValidInput, setIsValidInput] = useState(true);
   const [searchError, setSearchError] = useState<string | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; width: number } | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   
   const { lookupCNPJ, isLoading: isCNPJLoading, data, isSuccess, isError, error } = useCNPJLookup();
@@ -55,6 +57,42 @@ const SearchWithSuggestions = ({
 
   // Debounce para evitar muitas requisições
   const debounceTimeout = useRef<NodeJS.Timeout>();
+
+  // Função para calcular posição do dropdown
+  const calculateDropdownPosition = useCallback(() => {
+    if (!inputRef.current) return null;
+
+    const rect = inputRef.current.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    return {
+      top: rect.bottom + scrollTop + 8, // 8px de gap
+      left: rect.left,
+      width: rect.width
+    };
+  }, []);
+
+  // Atualizar posição quando mostrar sugestões
+  useEffect(() => {
+    if (showSuggestions) {
+      const position = calculateDropdownPosition();
+      setDropdownPosition(position);
+      
+      // Recalcular posição no scroll/resize
+      const handleReposition = () => {
+        const newPosition = calculateDropdownPosition();
+        setDropdownPosition(newPosition);
+      };
+      
+      window.addEventListener('scroll', handleReposition);
+      window.addEventListener('resize', handleReposition);
+      
+      return () => {
+        window.removeEventListener('scroll', handleReposition);
+        window.removeEventListener('resize', handleReposition);
+      };
+    }
+  }, [showSuggestions, calculateDropdownPosition]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -153,6 +191,7 @@ const SearchWithSuggestions = ({
         <div className="flex-1 relative">
           <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${size === "lg" ? "h-6 w-6" : "h-5 w-5"} text-gray-500`} />
           <Input
+            ref={inputRef}
             type="text"
             placeholder={placeholder}
             value={searchQuery}
@@ -204,9 +243,16 @@ const SearchWithSuggestions = ({
         </Button>
       </div>
 
-      {/* Suggestions dropdown */}
-      {showSuggestions && (suggestions.length > 0 || isSearching) && (
-        <div className="absolute top-full left-0 right-0 z-[9999] mt-2 bg-white border border-border rounded-lg shadow-2xl backdrop-blur-sm max-h-96 overflow-y-auto">
+      {/* Suggestions dropdown com position fixed */}
+      {showSuggestions && dropdownPosition && (suggestions.length > 0 || isSearching) && (
+        <div 
+          className="fixed z-[99999] bg-white border border-border rounded-lg shadow-2xl backdrop-blur-sm max-h-96 overflow-y-auto"
+          style={{
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`,
+          }}
+        >
           {isSearching ? (
             <div className="p-4 text-center">
               <Loader2 className="h-5 w-5 animate-spin mx-auto mb-2" />
@@ -291,9 +337,16 @@ const SearchWithSuggestions = ({
         </p>
       )}
 
-      {/* No results message */}
-      {showSuggestions && !isSearching && suggestions.length === 0 && searchQuery.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 z-[9999] mt-2 bg-white border border-border rounded-lg shadow-2xl backdrop-blur-sm p-4 text-center">
+      {/* No results message com position fixed */}
+      {showSuggestions && dropdownPosition && !isSearching && suggestions.length === 0 && searchQuery.length >= 2 && (
+        <div 
+          className="fixed z-[99999] bg-white border border-border rounded-lg shadow-2xl backdrop-blur-sm p-4 text-center"
+          style={{
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`,
+          }}
+        >
           <AlertCircle className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">
             Nenhuma empresa encontrada para "{searchQuery}"

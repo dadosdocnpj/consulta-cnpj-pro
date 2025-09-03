@@ -30,7 +30,7 @@ const HeroSection = () => {
           </div>
 
           {/* Main Search Card */}
-          <div className="relative max-w-3xl mx-auto mb-16 animate-slide-up" style={{animationDelay: '0.3s'}}>
+          <div className="relative max-w-3xl mx-auto mb-16 animate-slide-up z-50" style={{animationDelay: '0.3s'}}>
             <div className="bg-white/95 backdrop-blur-xl border border-white/30 rounded-2xl p-8 shadow-2xl">
               <SearchWithSuggestions 
                 variant="hero"
