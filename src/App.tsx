@@ -12,6 +12,10 @@ import EmpresasPorCidadePage from "./pages/EmpresasPorCidadePage";
 import CNAEsPage from "./pages/CNAEsPage";
 import CNAEsGrupoPage from "./pages/CNAEsGrupoPage";
 import CNAEDetalhePage from "./pages/CNAEDetalhePage";
+import TopEmpresasPage from "./pages/TopEmpresasPage";
+import EmpresasRecentesPage from "./pages/EmpresasRecentesPage";
+import StartupsPage from "./pages/StartupsPage";
+import EmpresasPublicasPage from "./pages/EmpresasPublicasPage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +34,10 @@ const App = () => (
             <Route path="/cnae" element={<CNAEsPage />} />
             <Route path="/cnae/grupo/:grupo" element={<CNAEsGrupoPage />} />
             <Route path="/cnae/codigo/:codigo" element={<CNAEDetalhePage />} />
+            <Route path="/ranking/top-empresas" element={<TopEmpresasPage />} />
+            <Route path="/empresas-recentes" element={<EmpresasRecentesPage />} />
+            <Route path="/categoria/startups" element={<StartupsPage />} />
+            <Route path="/categoria/publicas" element={<EmpresasPublicasPage />} />
             <Route path="/:slug" element={<Index />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
