@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, Building2, MapPin, Factory, Users, TrendingUp, Building, Sparkles, Shield } from 'lucide-react';
+import { ChevronDown, Building2, MapPin, Factory, Users, TrendingUp, Building, Sparkles, Shield, Search } from 'lucide-react';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -13,14 +13,21 @@ import { cn } from '@/lib/utils';
 import { useTopEmpresas } from '@/hooks/useTopEmpresas';
 import { useEmpresasRecentes } from '@/hooks/useEmpresasRecentes';
 import { useEmpresasPorCategoria } from '@/hooks/useEmpresasPorCategoria';
+import { useContadoresEstados } from '@/hooks/useContadoresEstados';
+import { useCidadesComEmpresas } from '@/hooks/useCidadesComEmpresas';
 import { cnaeSections } from '@/data/cnaes';
 import { estados } from '@/data/estados';
 
 const NavigationDropdown = () => {
+  const [estadoSearch, setEstadoSearch] = useState('');
+  const [cidadeSearch, setCidadeSearch] = useState('');
+  
   const { data: topEmpresas } = useTopEmpresas(5);
   const { data: empresasRecentes } = useEmpresasRecentes(5);
   const { data: startups } = useEmpresasPorCategoria('startups', 5);
   const { data: empresasPublicas } = useEmpresasPorCategoria('publicas', 5);
+  const { data: contadoresEstados } = useContadoresEstados();
+  const { data: cidadesComEmpresas } = useCidadesComEmpresas();
 
   const empresasLinks = [
     {
@@ -69,30 +76,60 @@ const NavigationDropdown = () => {
     }
   ];
 
+  // Estados filtrados com dados reais
+  const estadosFiltrados = useMemo(() => {
+    const estadosComContador = estados.map(estado => {
+      const contador = contadoresEstados?.find(c => c.uf === estado.uf);
+      return {
+        ...estado,
+        count: contador?.count || 0
+      };
+    }).filter(estado => 
+      estado.nome.toLowerCase().includes(estadoSearch.toLowerCase()) ||
+      estado.uf.toLowerCase().includes(estadoSearch.toLowerCase())
+    );
+    
+    return estadosComContador.sort((a, b) => b.count - a.count);
+  }, [contadoresEstados, estadoSearch]);
+
+  // Cidades filtradas com dados reais
+  const cidadesFiltradas = useMemo(() => {
+    if (!cidadesComEmpresas) return [];
+    
+    return cidadesComEmpresas.filter(cidade =>
+      cidade.municipio.toLowerCase().includes(cidadeSearch.toLowerCase()) ||
+      cidade.uf.toLowerCase().includes(cidadeSearch.toLowerCase())
+    ).slice(0, 10); // Limitar a 10 resultados
+  }, [cidadesComEmpresas, cidadeSearch]);
+
   const localizacaoLinks = [
     {
       title: "Estados",
       href: "/estados",
       description: "Explorar empresas por estado",
       icon: MapPin,
-      items: estados.slice(0, 5).map(estado => ({
-        name: estado.nome,
+      showSearch: true,
+      searchValue: estadoSearch,
+      onSearchChange: setEstadoSearch,
+      items: estadosFiltrados.slice(0, 8).map(estado => ({
+        name: `${estado.nome} (${estado.uf})`,
         href: `/estados/${estado.uf.toLowerCase()}`,
-        count: 0 // Placeholder para contagem de empresas
+        count: estado.count
       }))
     },
     {
-      title: "Principais Cidades",
-      href: "/estados",
+      title: "Cidades",
+      href: null, // Removido - não tem página geral
       description: "Maiores centros empresariais",
       icon: Building,
-      items: [
-        { name: "São Paulo - SP", href: "/estados/sp/sao-paulo", count: 500000 },
-        { name: "Rio de Janeiro - RJ", href: "/estados/rj/rio-de-janeiro", count: 200000 },
-        { name: "Belo Horizonte - MG", href: "/estados/mg/belo-horizonte", count: 150000 },
-        { name: "Brasília - DF", href: "/estados/df/brasilia", count: 120000 },
-        { name: "Salvador - BA", href: "/estados/ba/salvador", count: 100000 }
-      ]
+      showSearch: true,
+      searchValue: cidadeSearch,
+      onSearchChange: setCidadeSearch,
+      items: cidadesFiltradas.map(cidade => ({
+        name: `${cidade.municipio} - ${cidade.uf}`,
+        href: `/estados/${cidade.uf.toLowerCase()}/${cidade.municipio.toLowerCase().replace(/\s+/g, '-')}`,
+        count: cidade.count
+      }))
     }
   ];
 
@@ -176,38 +213,73 @@ const NavigationDropdown = () => {
           </NavigationMenuTrigger>
           <NavigationMenuContent>
             <div className="grid gap-3 p-6 w-[500px] lg:w-[600px] lg:grid-cols-2">
-              {localizacaoLinks.map((link) => (
-                <div key={link.href} className="space-y-3">
-                  <Link
-                    to={link.href}
-                    className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground group"
-                  >
-                    <div className="flex items-center space-x-2 mb-2">
-                      <link.icon className="h-4 w-4 text-primary" />
-                      <div className="text-sm font-medium leading-none group-hover:text-primary transition-smooth">
-                        {link.title}
+              {localizacaoLinks.map((link, linkIndex) => (
+                <div key={link.title} className="space-y-3">
+                  {link.href ? (
+                    <Link
+                      to={link.href}
+                      className="block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground group"
+                    >
+                      <div className="flex items-center space-x-2 mb-2">
+                        <link.icon className="h-4 w-4 text-primary" />
+                        <div className="text-sm font-medium leading-none group-hover:text-primary transition-smooth">
+                          {link.title}
+                        </div>
+                      </div>
+                      <p className="text-sm leading-snug text-muted-foreground">
+                        {link.description}
+                      </p>
+                    </Link>
+                  ) : (
+                    <div className="block select-none rounded-md p-3 leading-none">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <link.icon className="h-4 w-4 text-primary" />
+                        <div className="text-sm font-medium leading-none">
+                          {link.title}
+                        </div>
+                      </div>
+                      <p className="text-sm leading-snug text-muted-foreground">
+                        {link.description}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {link.showSearch && (
+                    <div className="ml-6 mb-2">
+                      <div className="relative">
+                        <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                        <input
+                          type="text"
+                          placeholder={`Buscar ${link.title.toLowerCase()}...`}
+                          value={link.searchValue}
+                          onChange={(e) => link.onSearchChange(e.target.value)}
+                          className="pl-7 pr-3 py-1 text-xs border border-border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-primary/50 w-full"
+                        />
                       </div>
                     </div>
-                    <p className="text-sm leading-snug text-muted-foreground">
-                      {link.description}
-                    </p>
-                  </Link>
+                  )}
                   
-                  <div className="space-y-1 ml-6">
-                    {link.items.map((item, index) => (
-                      <Link
-                        key={index}
-                        to={item.href}
-                        className="flex items-center justify-between text-xs text-muted-foreground hover:text-primary transition-smooth py-1"
-                      >
-                        <span>{item.name}</span>
-                        {item.count && (
-                          <span className="text-xs bg-muted px-2 py-0.5 rounded">
-                            {item.count.toLocaleString()}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
+                  <div className="space-y-1 ml-6 max-h-48 overflow-y-auto">
+                    {link.items.length === 0 ? (
+                      <div className="text-xs text-muted-foreground py-2">
+                        {link.searchValue ? 'Nenhum resultado encontrado' : 'Carregando...'}
+                      </div>
+                    ) : (
+                      link.items.map((item, index) => (
+                        <Link
+                          key={index}
+                          to={item.href}
+                          className="flex items-center justify-between text-xs text-muted-foreground hover:text-primary transition-smooth py-1 block"
+                        >
+                          <span className="truncate flex-1 mr-2">{item.name}</span>
+                          {item.count !== undefined && item.count > 0 && (
+                            <span className="text-xs bg-muted px-2 py-0.5 rounded shrink-0">
+                              {item.count.toLocaleString()}
+                            </span>
+                          )}
+                        </Link>
+                      ))
+                    )}
                   </div>
                 </div>
               ))}
