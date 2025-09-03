@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.render-cnpj]
 verify_jwt = false
+
+[functions.populate-cnpj-cache]
+verify_jwt = false
