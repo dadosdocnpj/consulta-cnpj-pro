@@ -20,14 +20,16 @@ const HeroSection = () => {
               <span className="text-sm font-medium text-primary-foreground">100% Gratuito • Dados Atualizados</span>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight font-heading">
-              <span className="text-white drop-shadow-lg">Descubra tudo sobre qualquer</span>{" "}
-              <span className="text-gradient bg-gradient-accent bg-clip-text text-transparent drop-shadow-lg">empresa</span>{" "}
-              <span className="text-white drop-shadow-lg">do Brasil em segundos</span>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight font-heading text-white drop-shadow-lg">
+              Consulta CNPJ Gratuita de Empresas Brasileiras com Dados Oficiais e Atualizados
             </h1>
             
-            <p className="text-xl md:text-2xl text-white/90 mb-12 leading-relaxed max-w-3xl mx-auto drop-shadow-sm">
-              Milhões de empresas na palma da sua mão. Informações sempre atualizadas para suas decisões importantes.
+            <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed max-w-4xl mx-auto drop-shadow-sm">
+              Encontre informações completas de qualquer empresa registrada no Brasil: razão social, nome fantasia, endereço, CNAEs, sócios, situação cadastral e muito mais. Dados atualizados diretamente da Receita Federal.
+            </p>
+            
+            <p className="text-base md:text-lg text-white/80 mb-8 leading-relaxed max-w-2xl mx-auto drop-shadow-sm">
+              🔎 Digite o CNPJ ou nome da empresa e comece sua consulta agora mesmo.
             </p>
           </div>
 
