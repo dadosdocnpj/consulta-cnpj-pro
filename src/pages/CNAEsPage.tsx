@@ -1,9 +1,45 @@
 import { Link } from "react-router-dom";
 import PageLayout from "@/components/PageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { cnaeSections } from "@/data/cnaes";
+import { Badge } from "@/components/ui/badge";
+import { useCNAESecoes } from "@/hooks/useCNAEsData";
+import LoadingCard from "@/components/LoadingCard";
+import EmptyState from "@/components/EmptyState";
 
 const CNAEsPage = () => {
+  const { data: secoes, isLoading, error } = useCNAESecoes();
+
+  if (isLoading) {
+    return (
+      <PageLayout
+        title="Classificação Nacional de Atividades Econômicas (CNAE)"
+        description="Navegue por empresas organizadas por setores e atividades econômicas"
+        breadcrumbItems={[{ label: "CNAEs" }]}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <LoadingCard key={i} />
+          ))}
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (error || !secoes?.length) {
+    return (
+      <PageLayout
+        title="Classificação Nacional de Atividades Econômicas (CNAE)"
+        description="Navegue por empresas organizadas por setores e atividades econômicas"
+        breadcrumbItems={[{ label: "CNAEs" }]}
+      >
+        <EmptyState 
+          title="Erro ao carregar CNAEs"
+          description="Não foi possível carregar as seções CNAE"
+        />
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout
       title="Classificação Nacional de Atividades Econômicas (CNAE)"
@@ -20,11 +56,11 @@ const CNAEsPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {cnaeSections.map((secao) => (
-            <Link key={secao.codigo} to={`/cnae/grupo/${secao.slug}`}>
+          {secoes.map((secao) => (
+            <Link key={secao.id} to={`/cnae/secao/${secao.slug}`}>
               <Card className="h-full hover:shadow-lg transition-all duration-200 hover:scale-105 cursor-pointer">
                 <CardHeader className="text-center">
-                  <div className="text-4xl mb-2">{secao.icon}</div>
+                  <div className="text-4xl mb-2">{secao.icone || "📋"}</div>
                   <CardTitle className="text-lg">
                     Seção {secao.codigo}
                   </CardTitle>
@@ -33,9 +69,18 @@ const CNAEsPage = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground text-center">
-                    {secao.descricao}
-                  </p>
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground text-center">
+                      {secao.descricao}
+                    </p>
+                    {secao.total_empresas > 0 && (
+                      <div className="flex justify-center">
+                        <Badge variant="secondary">
+                          {secao.total_empresas.toLocaleString()} empresas
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </Link>

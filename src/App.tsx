@@ -10,6 +10,11 @@ import EstadosPage from "./pages/EstadosPage";
 import CidadesPage from "./pages/CidadesPage";
 import EmpresasPorCidadePage from "./pages/EmpresasPorCidadePage";
 import CNAEsPage from "./pages/CNAEsPage";
+import CNAESecaoPage from "./pages/CNAESecaoPage";
+import CNAEDivisaoPage from "./pages/CNAEDivisaoPage";
+import CNAEGrupoPage from "./pages/CNAEGrupoPage";
+import CNAEClassePage from "./pages/CNAEClassePage";
+import CNAESubclassePage from "./pages/CNAESubclassePage";
 import CNAEsGrupoPage from "./pages/CNAEsGrupoPage";
 import CNAEDetalhePage from "./pages/CNAEDetalhePage";
 import TopEmpresasPage from "./pages/TopEmpresasPage";
@@ -34,6 +39,12 @@ const App = () => (
             <Route path="/estados/:uf" element={<CidadesPage />} />
             <Route path="/estados/:uf/:cidade" element={<EmpresasPorCidadePage />} />
             <Route path="/cnae" element={<CNAEsPage />} />
+            <Route path="/cnae/secao/:slug" element={<CNAESecaoPage />} />
+            <Route path="/cnae/divisao/:slug" element={<CNAEDivisaoPage />} />
+            <Route path="/cnae/grupo/:slug" element={<CNAEGrupoPage />} />
+            <Route path="/cnae/classe/:slug" element={<CNAEClassePage />} />
+            <Route path="/cnae/subclasse/:slug" element={<CNAESubclassePage />} />
+            {/* Legacy routes for backward compatibility */}
             <Route path="/cnae/grupo/:grupo" element={<CNAEsGrupoPage />} />
             <Route path="/cnae/codigo/:codigo" element={<CNAEDetalhePage />} />
             <Route path="/ranking/top-empresas" element={<TopEmpresasPage />} />

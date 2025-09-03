@@ -136,14 +136,16 @@ const NavigationDropdown = () => {
   const setoresLinks = [
     {
       title: "CNAEs por Seção",
-      href: "/cnaes",
+      href: "/cnae",
       description: "Classificação Nacional de Atividades",
       icon: Factory,
-      items: cnaeSections.slice(0, 5).map(secao => ({
-        name: secao.nome,
-        href: `/cnaes/secao/${secao.slug}`,
-        icon: secao.icon
-      }))
+      items: [
+        { name: "Informação e Comunicação", href: "/cnae/secao/informacao-comunicacao", icon: "💻" },
+        { name: "Comércio", href: "/cnae/secao/comercio", icon: "🛒" },
+        { name: "Atividades Profissionais", href: "/cnae/secao/atividades-profissionais", icon: "🔬" },
+        { name: "Indústrias de Transformação", href: "/cnae/secao/industrias-transformacao", icon: "🏭" },
+        { name: "Ver todas as seções", href: "/cnae", icon: "📋" }
+      ]
     },
     {
       title: "CNAEs Mais Comuns",
