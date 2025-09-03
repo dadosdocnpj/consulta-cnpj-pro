@@ -80,7 +80,7 @@ const CNAEsGrupoPage = () => {
                       {divisao.classes.map((classe) => (
                         <Link
                           key={classe.codigo}
-                          to={`/cnae/${classe.codigo}-${classe.slug}`}
+                          to={`/cnae/codigo/${classe.codigo}-${classe.slug}`}
                           className="flex items-center gap-3 p-3 rounded-md border hover:bg-muted/50 transition-colors"
                         >
                           <Building2 className="h-4 w-4 text-muted-foreground" />

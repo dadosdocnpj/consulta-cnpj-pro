@@ -21,7 +21,7 @@ const CNAEsPage = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cnaeSections.map((secao) => (
-            <Link key={secao.codigo} to={`/cnae/${secao.slug}`}>
+            <Link key={secao.codigo} to={`/cnae/grupo/${secao.slug}`}>
               <Card className="h-full hover:shadow-lg transition-all duration-200 hover:scale-105 cursor-pointer">
                 <CardHeader className="text-center">
                   <div className="text-4xl mb-2">{secao.icon}</div>
