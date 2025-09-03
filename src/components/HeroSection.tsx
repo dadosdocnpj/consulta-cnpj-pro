@@ -30,40 +30,13 @@ const HeroSection = () => {
           </div>
 
           {/* Main Search Card */}
-          <div className="relative max-w-3xl mx-auto mb-16 animate-slide-up" style={{animationDelay: '0.3s'}}>
+          <div className="relative max-w-3xl mx-auto mb-24 animate-slide-up" style={{animationDelay: '0.3s'}}>
             <div className="bg-white/95 backdrop-blur-xl border border-white/30 rounded-2xl p-8 shadow-2xl">
               <SearchWithSuggestions 
                 variant="hero"
                 size="lg"
                 placeholder="Ex: Petrobras, 11.222.333/0001-81 ou Magazine Luiza"
               />
-            </div>
-          </div>
-
-          {/* Feature highlights */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12 animate-slide-up" style={{animationDelay: '0.6s'}}>
-            <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center hover:bg-white/95 transition-all duration-300 hover:scale-105 shadow-xl">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-6 border border-primary/20">
-                <TrendingUp className="h-8 w-8 text-primary" />
-              </div>
-               <h3 className="font-bold text-gray-900 mb-3 text-xl">Sempre Atualizado</h3>
-               <p className="text-gray-600 text-base leading-relaxed">Informações em tempo real para decisões certeiras</p>
-             </div>
-             
-             <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center hover:bg-white/95 transition-all duration-300 hover:scale-105 shadow-xl">
-               <div className="inline-flex items-center justify-center w-16 h-16 bg-accent/10 rounded-2xl mb-6 border border-accent/20">
-                 <Shield className="h-8 w-8 text-accent" />
-               </div>
-               <h3 className="font-bold text-gray-900 mb-3 text-xl">Totalmente Grátis</h3>
-               <p className="text-gray-600 text-base leading-relaxed">Consultas ilimitadas sem pegadinhas ou custos ocultos</p>
-             </div>
-             
-             <div className="bg-white/90 backdrop-blur-md border border-white/30 rounded-2xl p-8 text-center hover:bg-white/95 transition-all duration-300 hover:scale-105 shadow-xl">
-               <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary/10 rounded-2xl mb-6 border border-secondary/20">
-                 <Clock className="h-8 w-8 text-secondary" />
-               </div>
-               <h3 className="font-bold text-gray-900 mb-3 text-xl">Resultados Instantâneos</h3>
-               <p className="text-gray-600 text-base leading-relaxed">Encontre o que precisa em poucos cliques</p>
             </div>
           </div>
 
