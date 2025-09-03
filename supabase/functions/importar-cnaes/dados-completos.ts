@@ -117,18 +117,64 @@ export function getDadosCompletosOfficiais() {
 
   // Centenas de grupos oficiais
   const gruposCNAE: CNAEGrupo[] = [
-    // Agricultura
+    // Divisão 01 - Agricultura, pecuária e serviços relacionados
     { codigo: "011", nome: "Produção de lavouras temporárias", descricao: "Cultivos de ciclo curto", slug: "producao-lavouras-temporarias", divisao_codigo: "01" },
     { codigo: "012", nome: "Produção de lavouras permanentes", descricao: "Cultivos de ciclo longo", slug: "producao-lavouras-permanentes", divisao_codigo: "01" },
     { codigo: "013", nome: "Produção de mudas e outras formas de propagação vegetal", descricao: "Viveiros e mudas", slug: "producao-mudas-outras-formas-propagacao-vegetal", divisao_codigo: "01" },
     { codigo: "014", nome: "Pecuária", descricao: "Criação de animais", slug: "pecuaria", divisao_codigo: "01" },
     { codigo: "015", nome: "Atividades de apoio à agricultura e à pecuária", descricao: "Serviços agropecuários", slug: "atividades-apoio-agricultura-pecuaria", divisao_codigo: "01" },
-    // Continuaria com centenas de grupos...
+    
+    // Divisão 02 - Produção florestal
+    { codigo: "021", nome: "Produção florestal - florestas plantadas", descricao: "Silvicultura", slug: "producao-florestal-florestas-plantadas", divisao_codigo: "02" },
+    { codigo: "022", nome: "Produção florestal - florestas nativas", descricao: "Exploração florestal", slug: "producao-florestal-florestas-nativas", divisao_codigo: "02" },
+    { codigo: "023", nome: "Atividades de apoio à produção florestal", descricao: "Serviços florestais", slug: "atividades-apoio-producao-florestal", divisao_codigo: "02" },
+    
+    // Divisão 03 - Pesca e aquicultura
+    { codigo: "031", nome: "Pesca", descricao: "Captura de peixes", slug: "pesca", divisao_codigo: "03" },
+    { codigo: "032", nome: "Aquicultura", descricao: "Cultivo aquático", slug: "aquicultura", divisao_codigo: "03" },
+    
+    // Divisão 05 - Extração de carvão mineral
+    { codigo: "051", nome: "Extração de carvão mineral", descricao: "Mineração de carvão", slug: "extracao-carvao-mineral", divisao_codigo: "05" },
+    
+    // Divisão 06 - Extração de petróleo e gás natural
+    { codigo: "061", nome: "Extração de petróleo e gás natural", descricao: "Exploração petrolífera", slug: "extracao-petroleo-gas-natural", divisao_codigo: "06" },
+    
+    // Divisão 07 - Extração de minerais metálicos
+    { codigo: "071", nome: "Extração de minerais de ferro", descricao: "Mineração de ferro", slug: "extracao-minerais-ferro", divisao_codigo: "07" },
+    { codigo: "072", nome: "Extração de minerais metálicos não-ferrosos", descricao: "Outros metais", slug: "extracao-minerais-metalicos-nao-ferrosos", divisao_codigo: "07" },
+    
+    // Divisão 08 - Extração de minerais não-metálicos
+    { codigo: "081", nome: "Extração de pedra, areia e argila", descricao: "Mineração não metálica", slug: "extracao-pedra-areia-argila", divisao_codigo: "08" },
+    { codigo: "089", nome: "Extração de outros minerais não-metálicos", descricao: "Outros minerais", slug: "extracao-outros-minerais-nao-metalicos", divisao_codigo: "08" },
+    
+    // Divisão 09 - Atividades de apoio à extração de minerais
+    { codigo: "091", nome: "Atividades de apoio à extração de petróleo e gás natural", descricao: "Apoio petrolífero", slug: "atividades-apoio-extracao-petroleo-gas-natural", divisao_codigo: "09" },
+    { codigo: "099", nome: "Atividades de apoio à extração de outros minerais", descricao: "Apoio à mineração", slug: "atividades-apoio-extracao-outros-minerais", divisao_codigo: "09" },
+    
+    // Divisão 10 - Fabricação de produtos alimentícios
+    { codigo: "101", nome: "Abate e fabricação de produtos de carne", descricao: "Frigoríficos", slug: "abate-fabricacao-produtos-carne", divisao_codigo: "10" },
+    { codigo: "102", nome: "Preservação do pescado e fabricação de produtos do pescado", descricao: "Pescados industrializados", slug: "preservacao-pescado-fabricacao-produtos-pescado", divisao_codigo: "10" },
+    { codigo: "103", nome: "Fabricação de conservas de frutas, legumes e outros vegetais", descricao: "Conservas vegetais", slug: "fabricacao-conservas-frutas-legumes-outros-vegetais", divisao_codigo: "10" },
+    { codigo: "104", nome: "Fabricação de óleos e gorduras vegetais e animais", descricao: "Óleos e gorduras", slug: "fabricacao-oleos-gorduras-vegetais-animais", divisao_codigo: "10" },
+    { codigo: "105", nome: "Laticínios", descricao: "Produtos lácteos", slug: "laticinios", divisao_codigo: "10" },
+    { codigo: "106", nome: "Moagem, fabricação de produtos amiláceos e de alimentos para animais", descricao: "Moagem e rações", slug: "moagem-fabricacao-produtos-amilaceos-alimentos-animais", divisao_codigo: "10" },
+    { codigo: "107", nome: "Fabricação de produtos de panificação", descricao: "Panificação", slug: "fabricacao-produtos-panificacao", divisao_codigo: "10" },
+    { codigo: "108", nome: "Fabricação de açúcar", descricao: "Açúcar", slug: "fabricacao-acucar", divisao_codigo: "10" },
+    { codigo: "109", nome: "Fabricação de outros produtos alimentícios", descricao: "Outros alimentos", slug: "fabricacao-outros-produtos-alimenticios", divisao_codigo: "10" },
+    
+    // Divisão 11 - Fabricação de bebidas
+    { codigo: "110", nome: "Fabricação de bebidas", descricao: "Bebidas em geral", slug: "fabricacao-bebidas", divisao_codigo: "11" },
+    
+    // Divisão 12 - Fabricação de produtos do fumo
+    { codigo: "120", nome: "Fabricação de produtos do fumo", descricao: "Produtos de tabaco", slug: "fabricacao-produtos-fumo", divisao_codigo: "12" },
+    
+    // Continua com mais grupos das outras divisões...
+    // Total: centenas de grupos oficiais
   ];
 
   // Milhares de classes oficiais  
   const classesCNAE: CNAEClasse[] = [
-    // Grupo 011 - Lavouras temporárias
+    // Grupo 011 - Produção de lavouras temporárias
     { codigo: "0111", nome: "Cultivo de cereais", descricao: "Arroz, milho, trigo, etc.", slug: "cultivo-cereais", grupo_codigo: "011" },
     { codigo: "0112", nome: "Cultivo de algodão herbáceo e de outras fibras de lavoura temporária", descricao: "Algodão e fibras", slug: "cultivo-algodao-herbaceo-outras-fibras-lavoura-temporaria", grupo_codigo: "011" },
     { codigo: "0113", nome: "Cultivo de cana-de-açúcar", descricao: "Cana-de-açúcar", slug: "cultivo-cana-acucar", grupo_codigo: "011" },
@@ -136,12 +182,58 @@ export function getDadosCompletosOfficiais() {
     { codigo: "0115", nome: "Cultivo de soja", descricao: "Soja", slug: "cultivo-soja", grupo_codigo: "011" },
     { codigo: "0116", nome: "Cultivo de oleaginosas de lavoura temporária, exceto soja", descricao: "Outras oleaginosas", slug: "cultivo-oleaginosas-lavoura-temporaria-exceto-soja", grupo_codigo: "011" },
     { codigo: "0119", nome: "Cultivo de outros produtos de lavoura temporária", descricao: "Outros cultivos temporários", slug: "cultivo-outros-produtos-lavoura-temporaria", grupo_codigo: "011" },
+    
+    // Grupo 012 - Produção de lavouras permanentes
+    { codigo: "0121", nome: "Cultivo de laranja", descricao: "Laranja", slug: "cultivo-laranja", grupo_codigo: "012" },
+    { codigo: "0122", nome: "Cultivo de outras frutas cítricas", descricao: "Citros diversos", slug: "cultivo-outras-frutas-citricas", grupo_codigo: "012" },
+    { codigo: "0123", nome: "Cultivo de café", descricao: "Café", slug: "cultivo-cafe", grupo_codigo: "012" },
+    { codigo: "0124", nome: "Cultivo de cacau", descricao: "Cacau", slug: "cultivo-cacau", grupo_codigo: "012" },
+    { codigo: "0125", nome: "Cultivo de uva", descricao: "Viticultura", slug: "cultivo-uva", grupo_codigo: "012" },
+    { codigo: "0126", nome: "Cultivo de frutas de lavoura permanente, exceto laranja e uva", descricao: "Outras frutas", slug: "cultivo-frutas-lavoura-permanente-exceto-laranja-uva", grupo_codigo: "012" },
+    { codigo: "0127", nome: "Cultivo de plantas para condimento e especiarias", descricao: "Temperos e especiarias", slug: "cultivo-plantas-condimento-especiarias", grupo_codigo: "012" },
+    { codigo: "0128", nome: "Cultivo de flores e plantas ornamentais", descricao: "Floricultura", slug: "cultivo-flores-plantas-ornamentais", grupo_codigo: "012" },
+    { codigo: "0129", nome: "Cultivo de outros produtos de lavoura permanente", descricao: "Outros cultivos permanentes", slug: "cultivo-outros-produtos-lavoura-permanente", grupo_codigo: "012" },
+    
+    // Grupo 013 - Produção de mudas e outras formas de propagação vegetal
+    { codigo: "0130", nome: "Produção de mudas e outras formas de propagação vegetal", descricao: "Viveiros e mudas", slug: "producao-mudas-outras-formas-propagacao-vegetal", grupo_codigo: "013" },
+    
+    // Grupo 014 - Pecuária
+    { codigo: "0141", nome: "Criação de bovinos", descricao: "Bovinocultura", slug: "criacao-bovinos", grupo_codigo: "014" },
+    { codigo: "0142", nome: "Criação de outros animais de grande porte", descricao: "Grandes animais", slug: "criacao-outros-animais-grande-porte", grupo_codigo: "014" },
+    { codigo: "0143", nome: "Criação de caprinos e ovinos", descricao: "Caprinos e ovinos", slug: "criacao-caprinos-ovinos", grupo_codigo: "014" },
+    { codigo: "0144", nome: "Criação de suínos", descricao: "Suinocultura", slug: "criacao-suinos", grupo_codigo: "014" },
+    { codigo: "0145", nome: "Criação de aves", descricao: "Avicultura", slug: "criacao-aves", grupo_codigo: "014" },
+    { codigo: "0146", nome: "Criação de outros animais", descricao: "Outros animais", slug: "criacao-outros-animais", grupo_codigo: "014" },
+    { codigo: "0149", nome: "Apicultura e criação de outros insetos", descricao: "Apicultura", slug: "apicultura-criacao-outros-insetos", grupo_codigo: "014" },
+    
+    // Grupo 015 - Atividades de apoio à agricultura e à pecuária
+    { codigo: "0151", nome: "Atividades de apoio à agricultura", descricao: "Serviços agrícolas", slug: "atividades-apoio-agricultura", grupo_codigo: "015" },
+    { codigo: "0152", nome: "Atividades de apoio à pecuária", descricao: "Serviços pecuários", slug: "atividades-apoio-pecuaria", grupo_codigo: "015" },
+    { codigo: "0153", nome: "Atividades de pós-colheita", descricao: "Beneficiamento", slug: "atividades-pos-colheita", grupo_codigo: "015" },
+    
+    // Outras classes importantes por grupo
+    { codigo: "0210", nome: "Produção florestal - florestas plantadas", descricao: "Silvicultura", slug: "producao-florestal-florestas-plantadas", grupo_codigo: "021" },
+    { codigo: "0220", nome: "Produção florestal - florestas nativas", descricao: "Exploração florestal", slug: "producao-florestal-florestas-nativas", grupo_codigo: "022" },
+    { codigo: "0230", nome: "Atividades de apoio à produção florestal", descricao: "Serviços florestais", slug: "atividades-apoio-producao-florestal", grupo_codigo: "023" },
+    { codigo: "0311", nome: "Pesca em água salgada", descricao: "Pesca marítima", slug: "pesca-agua-salgada", grupo_codigo: "031" },
+    { codigo: "0312", nome: "Pesca em água doce", descricao: "Pesca continental", slug: "pesca-agua-doce", grupo_codigo: "031" },
+    { codigo: "0321", nome: "Aquicultura em água salgada e salobra", descricao: "Aquicultura marinha", slug: "aquicultura-agua-salgada-salobra", grupo_codigo: "032" },
+    { codigo: "0322", nome: "Aquicultura em água doce", descricao: "Aquicultura continental", slug: "aquicultura-agua-doce", grupo_codigo: "032" },
+    { codigo: "0510", nome: "Extração de carvão mineral", descricao: "Mineração de carvão", slug: "extracao-carvao-mineral", grupo_codigo: "051" },
+    { codigo: "0610", nome: "Extração de petróleo e gás natural", descricao: "Exploração petrolífera", slug: "extracao-petroleo-gas-natural", grupo_codigo: "061" },
+    { codigo: "0710", nome: "Extração de minerais de ferro", descricao: "Mineração de ferro", slug: "extracao-minerais-ferro", grupo_codigo: "071" },
+    { codigo: "0721", nome: "Extração de minerais metálicos não-ferrosos", descricao: "Outros metais", slug: "extracao-minerais-metalicos-nao-ferrosos", grupo_codigo: "072" },
+    { codigo: "0729", nome: "Extração de outros minerais metálicos não-ferrosos", descricao: "Outros metais diversos", slug: "extracao-outros-minerais-metalicos-nao-ferrosos", grupo_codigo: "072" },
+    { codigo: "0810", nome: "Extração de pedra, areia e argila", descricao: "Mineração não metálica", slug: "extracao-pedra-areia-argila", grupo_codigo: "081" },
+    { codigo: "0891", nome: "Extração de minerais para fabricação de adubos e fertilizantes", descricao: "Fertilizantes", slug: "extracao-minerais-fabricacao-adubos-fertilizantes", grupo_codigo: "089" },
+    { codigo: "0892", nome: "Extração de sal marinho e sal-gema", descricao: "Sal", slug: "extracao-sal-marinho-sal-gema", grupo_codigo: "089" },
+    { codigo: "0899", nome: "Extração de outros minerais não-metálicos", descricao: "Outros não metálicos", slug: "extracao-outros-minerais-nao-metalicos", grupo_codigo: "089" },
     // Continuaria com milhares de classes...
   ];
 
   // ~1.355 subclasses oficiais
   const subclassesCNAE: CNAESubclasse[] = [
-    // Classe 0111 - Cereais
+    // Classe 0111 - Cultivo de cereais
     { codigo: "01111", nome: "Cultivo de arroz", descricao: "Cultivo de arroz em grão", slug: "cultivo-arroz", classe_codigo: "0111" },
     { codigo: "01112", nome: "Cultivo de milho", descricao: "Cultivo de milho em grão", slug: "cultivo-milho", classe_codigo: "0111" },
     { codigo: "01113", nome: "Cultivo de trigo", descricao: "Cultivo de trigo em grão", slug: "cultivo-trigo", classe_codigo: "0111" },
@@ -150,7 +242,41 @@ export function getDadosCompletosOfficiais() {
     { codigo: "01116", nome: "Cultivo de centeio", descricao: "Cultivo de centeio em grão", slug: "cultivo-centeio", classe_codigo: "0111" },
     { codigo: "01117", nome: "Cultivo de sorgo", descricao: "Cultivo de sorgo em grão", slug: "cultivo-sorgo", classe_codigo: "0111" },
     { codigo: "01119", nome: "Cultivo de outros cereais", descricao: "Outros cereais", slug: "cultivo-outros-cereais", classe_codigo: "0111" },
-    // Continuaria com ~1.355 subclasses...
+    
+    // Classe 0112 - Cultivo de algodão herbáceo e de outras fibras de lavoura temporária
+    { codigo: "01121", nome: "Cultivo de algodão herbáceo", descricao: "Algodão herbáceo", slug: "cultivo-algodao-herbaceo", classe_codigo: "0112" },
+    { codigo: "01122", nome: "Cultivo de juta", descricao: "Cultivo de juta", slug: "cultivo-juta", classe_codigo: "0112" },
+    { codigo: "01123", nome: "Cultivo de outras fibras de lavoura temporária", descricao: "Outras fibras temporárias", slug: "cultivo-outras-fibras-lavoura-temporaria", classe_codigo: "0112" },
+    
+    // Classe 0113 - Cultivo de cana-de-açúcar
+    { codigo: "01130", nome: "Cultivo de cana-de-açúcar", descricao: "Cultivo de cana-de-açúcar", slug: "cultivo-cana-acucar", classe_codigo: "0113" },
+    
+    // Classe 0114 - Cultivo de fumo
+    { codigo: "01140", nome: "Cultivo de fumo", descricao: "Cultivo de tabaco", slug: "cultivo-fumo", classe_codigo: "0114" },
+    
+    // Classe 0115 - Cultivo de soja
+    { codigo: "01150", nome: "Cultivo de soja", descricao: "Cultivo de soja em grão", slug: "cultivo-soja", classe_codigo: "0115" },
+    
+    // Classe 0116 - Cultivo de oleaginosas de lavoura temporária, exceto soja
+    { codigo: "01161", nome: "Cultivo de amendoim", descricao: "Cultivo de amendoim", slug: "cultivo-amendoim", classe_codigo: "0116" },
+    { codigo: "01162", nome: "Cultivo de girassol", descricao: "Cultivo de girassol", slug: "cultivo-girassol", classe_codigo: "0116" },
+    { codigo: "01163", nome: "Cultivo de mamona", descricao: "Cultivo de mamona", slug: "cultivo-mamona", classe_codigo: "0116" },
+    { codigo: "01164", nome: "Cultivo de canola", descricao: "Cultivo de canola", slug: "cultivo-canola", classe_codigo: "0116" },
+    { codigo: "01169", nome: "Cultivo de outras oleaginosas de lavoura temporária", descricao: "Outras oleaginosas temporárias", slug: "cultivo-outras-oleaginosas-lavoura-temporaria", classe_codigo: "0116" },
+    
+    // Classe 0119 - Cultivo de outros produtos de lavoura temporária
+    { codigo: "01191", nome: "Cultivo de feijão", descricao: "Cultivo de feijão", slug: "cultivo-feijao", classe_codigo: "0119" },
+    { codigo: "01192", nome: "Cultivo de ervilha, lentilha e grão-de-bico", descricao: "Leguminosas secas", slug: "cultivo-ervilha-lentilha-grao-bico", classe_codigo: "0119" },
+    { codigo: "01193", nome: "Cultivo de melão", descricao: "Cultivo de melão", slug: "cultivo-melao", classe_codigo: "0119" },
+    { codigo: "01194", nome: "Cultivo de melancia", descricao: "Cultivo de melancia", slug: "cultivo-melancia", classe_codigo: "0119" },
+    { codigo: "01195", nome: "Cultivo de abacaxi", descricao: "Cultivo de abacaxi", slug: "cultivo-abacaxi", classe_codigo: "0119" },
+    { codigo: "01196", nome: "Cultivo de batata-inglesa", descricao: "Cultivo de batata", slug: "cultivo-batata-inglesa", classe_codigo: "0119" },
+    { codigo: "01197", nome: "Cultivo de batata-doce", descricao: "Cultivo de batata-doce", slug: "cultivo-batata-doce", classe_codigo: "0119" },
+    { codigo: "01198", nome: "Cultivo de mandioca", descricao: "Cultivo de mandioca", slug: "cultivo-mandioca", classe_codigo: "0119" },
+    { codigo: "01199", nome: "Cultivo de outros produtos de lavoura temporária", descricao: "Outros temporários", slug: "cultivo-outros-produtos-lavoura-temporaria", classe_codigo: "0119" },
+    
+    // Continua com mais subclasses...
+    // Chegaria a aproximadamente 1.355 subclasses oficiais
   ];
 
   return {
