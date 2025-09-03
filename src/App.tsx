@@ -28,8 +28,8 @@ const App = () => (
             <Route path="/estados/:uf" element={<CidadesPage />} />
             <Route path="/estados/:uf/:cidade" element={<EmpresasPorCidadePage />} />
             <Route path="/cnae" element={<CNAEsPage />} />
-            <Route path="/cnae/:grupo" element={<CNAEsGrupoPage />} />
-            <Route path="/cnae/:codigo" element={<CNAEDetalhePage />} />
+            <Route path="/cnae/grupo/:grupo" element={<CNAEsGrupoPage />} />
+            <Route path="/cnae/codigo/:codigo" element={<CNAEDetalhePage />} />
             <Route path="/:slug" element={<Index />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
