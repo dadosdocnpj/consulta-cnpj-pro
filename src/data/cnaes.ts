@@ -172,6 +172,23 @@ export const cnaeSections = [
 
 export const cnaeGrupos: CNAEGrupo[] = [
   {
+    codigo: "C",
+    nome: "Indústrias de Transformação",
+    secao: "C",
+    descricao: "Fabricação e transformação de produtos industriais",
+    slug: "industrias-transformacao",
+    divisoes: [
+      {
+        codigo: "11",
+        nome: "Fabricação de bebidas",
+        slug: "fabricacao-bebidas",
+        classes: [
+          { codigo: "1113502", nome: "Fabricação de refrigerantes e de outras bebidas não alcoólicas", slug: "fabricacao-refrigerantes" }
+        ]
+      }
+    ]
+  },
+  {
     codigo: "G",
     nome: "Comércio; Reparação de Veículos Automotores e Motocicletas",
     secao: "G",
@@ -195,7 +212,8 @@ export const cnaeGrupos: CNAEGrupo[] = [
         classes: [
           { codigo: "4611", nome: "Representantes comerciais e agentes do comércio", slug: "representantes-comerciais" },
           { codigo: "4621", nome: "Comércio atacadista de café em grão", slug: "comercio-atacadista-cafe" },
-          { codigo: "4631", nome: "Comércio atacadista de leite e laticínios", slug: "comercio-atacadista-laticinios" }
+          { codigo: "4631", nome: "Comércio atacadista de leite e laticínios", slug: "comercio-atacadista-laticinios" },
+          { codigo: "4649401", nome: "Comércio atacadista de produtos alimentícios em geral", slug: "comercio-atacadista" }
         ]
       },
       {
@@ -224,7 +242,7 @@ export const cnaeGrupos: CNAEGrupo[] = [
         classes: [
           { codigo: "6201", nome: "Desenvolvimento de programas de computador sob encomenda", slug: "desenvolvimento-programas-encomenda" },
           { codigo: "6202", nome: "Desenvolvimento e licenciamento de programas de computador customizáveis", slug: "desenvolvimento-programas-customizaveis" },
-          { codigo: "6203", nome: "Desenvolvimento e licenciamento de programas de computador não customizáveis", slug: "desenvolvimento-programas-nao-customizaveis" }
+          { codigo: "6203100", nome: "Desenvolvimento e licenciamento de programas de computador não customizáveis", slug: "desenvolvimento-de-programas" }
         ]
       },
       {
@@ -234,6 +252,23 @@ export const cnaeGrupos: CNAEGrupo[] = [
         classes: [
           { codigo: "6311", nome: "Tratamento de dados, provedores de serviços de aplicação e serviços de hospedagem na internet", slug: "tratamento-dados-hospedagem" },
           { codigo: "6319", nome: "Portais, provedores de conteúdo e outros serviços de informação na internet", slug: "portais-provedores-conteudo" }
+        ]
+      }
+    ]
+  },
+  {
+    codigo: "K",
+    nome: "Atividades Financeiras, de Seguros e Serviços Relacionados",
+    secao: "K",
+    descricao: "Bancos, seguradoras e serviços financeiros",
+    slug: "atividades-financeiras",
+    divisoes: [
+      {
+        codigo: "64",
+        nome: "Atividades de serviços financeiros",
+        slug: "servicos-financeiros",
+        classes: [
+          { codigo: "6422100", nome: "Bancos múltiplos, com carteira comercial", slug: "bancos-multiplos" }
         ]
       }
     ]
@@ -261,18 +296,45 @@ export const cnaeGrupos: CNAEGrupo[] = [
         classes: [
           { codigo: "7020", nome: "Atividades de consultoria em gestão empresarial", slug: "consultoria-gestao" }
         ]
+      },
+      {
+        codigo: "73",
+        nome: "Publicidade e pesquisa de mercado",
+        slug: "publicidade-pesquisa-mercado",
+        classes: [
+          { codigo: "7320300", nome: "Pesquisa de mercado e de opinião pública", slug: "pesquisa-de-mercado" }
+        ]
+      }
+    ]
+  },
+  {
+    codigo: "S",
+    nome: "Outras Atividades de Serviços",
+    secao: "S",
+    descricao: "Serviços diversos não classificados anteriormente",
+    slug: "outras-atividades-servicos",
+    divisoes: [
+      {
+        codigo: "94",
+        nome: "Atividades de organizações associativas",
+        slug: "organizacoes-associativas",
+        classes: [
+          { codigo: "9430800", nome: "Atividades de organizações profissionais", slug: "atividades-de-organizacoes" }
+        ]
       }
     ]
   }
 ];
 
 export const popularCNAEs = [
+  { codigo: "1113502", nome: "Fabricação de refrigerantes e de outras bebidas não alcoólicas", slug: "fabricacao-refrigerantes" },
+  { codigo: "4649401", nome: "Comércio atacadista de produtos alimentícios em geral", slug: "comercio-atacadista" },
+  { codigo: "6203100", nome: "Desenvolvimento e licenciamento de programas de computador não customizáveis", slug: "desenvolvimento-de-programas" },
+  { codigo: "6422100", nome: "Bancos múltiplos, com carteira comercial", slug: "bancos-multiplos" },
+  { codigo: "7320300", nome: "Pesquisa de mercado e de opinião pública", slug: "pesquisa-de-mercado" },
+  { codigo: "9430800", nome: "Atividades de organizações profissionais", slug: "atividades-de-organizacoes" },
   { codigo: "4711-3/02", nome: "Hipermercados", slug: "hipermercados" },
   { codigo: "4712-1/00", nome: "Supermercados", slug: "supermercados" },
   { codigo: "6201-5/00", nome: "Desenvolvimento de programas de computador sob encomenda", slug: "desenvolvimento-software" },
-  { codigo: "6920-6/01", nome: "Serviços de contabilidade", slug: "servicos-contabilidade" },
-  { codigo: "4520-0/01", nome: "Serviços de manutenção e reparação mecânica de veículos automotores", slug: "manutencao-veiculos" },
-  { codigo: "7020-4/00", nome: "Atividades de consultoria em gestão empresarial", slug: "consultoria-empresarial" },
-  { codigo: "4713-0/01", nome: "Lojas de departamentos ou magazines", slug: "lojas-departamentos" },
-  { codigo: "6319-4/00", nome: "Portais, provedores de conteúdo e outros serviços de informação na internet", slug: "portais-internet" }
+  { codigo: "6920-6/01", nome: "Serviços de contabilidade", slug: "servicos-contabilidade" }
 ];
