@@ -4,6 +4,7 @@ import { getEstadoPorUF } from "@/data/estados";
 import { useCidadesDoEstado } from "@/hooks/useCidadesDoEstado";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Building2 } from "lucide-react";
+import { createCitySlug } from "@/lib/utils";
 import NotFound from "./NotFound";
 
 const CidadesPage = () => {
@@ -43,11 +44,13 @@ const CidadesPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {cidades.map((cidadeInfo) => (
-              <Link
-                key={cidadeInfo.municipio}
-                to={`/estados/${uf}/${encodeURIComponent(cidadeInfo.municipio)}`}
-              >
+            {cidades.map((cidadeInfo) => {
+              const citySlug = createCitySlug(cidadeInfo.municipio);
+              return (
+                <Link
+                  key={cidadeInfo.municipio}
+                  to={`/estados/${uf}/${citySlug}`}
+                >)
                 <Card className="hover:shadow-md transition-shadow cursor-pointer">
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center space-x-2">
@@ -64,8 +67,9 @@ const CidadesPage = () => {
                     </div>
                   </CardContent>
                 </Card>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
     </PageLayout>

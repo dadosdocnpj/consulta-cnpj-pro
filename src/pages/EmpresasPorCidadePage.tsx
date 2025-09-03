@@ -1,11 +1,12 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import PageLayout from "@/components/PageLayout";
 import { getEstadoPorUF } from "@/data/estados";
 import { useEmpresasPorCidade } from "@/hooks/useEmpresasPorCidade";
 import EmpresaCard from "@/components/EmpresaCard";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { parseCityFromSlug } from "@/lib/utils";
 import NotFound from "./NotFound";
 
 const EmpresasPorCidadePage = () => {
@@ -14,11 +15,16 @@ const EmpresasPorCidadePage = () => {
   const pageSize = 20;
   
   const estado = uf ? getEstadoPorUF(uf) : undefined;
-  const cidadeDecoded = cidade ? decodeURIComponent(cidade) : '';
+  
+  // Processa o slug da cidade para obter o nome original
+  const cidadeProcessed = useMemo(() => {
+    if (!cidade) return '';
+    return parseCityFromSlug(cidade);
+  }, [cidade]);
   
   const { data, isLoading, error } = useEmpresasPorCidade(
     uf || '', 
-    cidadeDecoded, 
+    cidadeProcessed, 
     currentPage, 
     pageSize
   );
@@ -31,12 +37,12 @@ const EmpresasPorCidadePage = () => {
 
   return (
     <PageLayout
-      title={`Empresas em ${cidadeDecoded}`}
-      description={`Lista de empresas cadastradas em ${cidadeDecoded}, ${estado.nome}`}
+      title={`Empresas em ${cidadeProcessed}`}
+      description={`Lista de empresas cadastradas em ${cidadeProcessed}, ${estado.nome}`}
       breadcrumbItems={[
         { label: "Estados", href: "/estados" },
         { label: estado.nome, href: `/estados/${uf}` },
-        { label: cidadeDecoded }
+        { label: cidadeProcessed }
       ]}
     >
       {isLoading ? (
@@ -53,7 +59,7 @@ const EmpresasPorCidadePage = () => {
             Nenhuma empresa encontrada
           </h2>
           <p className="text-muted-foreground">
-            Não há empresas cadastradas em {cidadeDecoded}, {estado.nome} no momento.
+            Não há empresas cadastradas em {cidadeProcessed}, {estado.nome} no momento.
           </p>
         </div>
       ) : (
