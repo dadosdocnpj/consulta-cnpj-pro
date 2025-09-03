@@ -38,9 +38,11 @@ export const useEmpresaSearch = () => {
       });
 
       if (error) {
+        console.error('Erro na função empresa-search:', error);
         throw new Error(error.message || 'Erro na busca');
       }
 
+      console.log('Resposta da busca:', data);
       setSuggestions(data?.suggestions || []);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido na busca';

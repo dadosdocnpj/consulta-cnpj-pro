@@ -37,11 +37,14 @@ serve(async (req) => {
 
     console.log('Buscando empresas com query:', query);
 
+    // Escape caracteres especiais para busca segura
+    const escapedQuery = query.replace(/[%_]/g, '\\$&');
+    
     // Buscar por nome da empresa (ILIKE para busca aproximada)
     const { data, error } = await supabaseClient
       .from('cnpj_cache')
       .select('json_data, cnpj, slug')
-      .or(`json_data->>'razao_social'.ilike.%${query}%,json_data->>'nome_fantasia'.ilike.%${query}%`)
+      .or(`json_data->>'razao_social'.ilike.%${escapedQuery}%,json_data->>'nome_fantasia'.ilike.%${escapedQuery}%`)
       .limit(limit)
       .order('created_at', { ascending: false });
 

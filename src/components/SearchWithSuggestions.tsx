@@ -39,16 +39,27 @@ const SearchWithSuggestions = ({
     return true;
   };
 
+  // Debounce para evitar muitas requisições
+  const debounceTimeout = useRef<NodeJS.Timeout>();
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
     setIsValidInput(validateInput(value));
 
+    // Limpar timeout anterior
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+
     // Se não for CNPJ válido, buscar sugestões por nome
     const normalized = normalizeCNPJInput(value);
     if (normalized.type !== 'cnpj' && value.length >= 2) {
-      searchEmpresas(value, 8);
-      setShowSuggestions(true);
+      // Adicionar debounce de 300ms
+      debounceTimeout.current = setTimeout(() => {
+        searchEmpresas(value, 8);
+        setShowSuggestions(true);
+      }, 300);
     } else {
       clearSuggestions();
       setShowSuggestions(false);
