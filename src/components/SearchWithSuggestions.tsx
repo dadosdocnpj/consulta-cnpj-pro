@@ -206,7 +206,7 @@ const SearchWithSuggestions = ({
 
       {/* Suggestions dropdown */}
       {showSuggestions && (suggestions.length > 0 || isSearching) && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white border border-border rounded-lg shadow-lg max-h-96 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 z-[9999] mt-2 bg-white border border-border rounded-lg shadow-2xl backdrop-blur-sm max-h-96 overflow-y-auto">
           {isSearching ? (
             <div className="p-4 text-center">
               <Loader2 className="h-5 w-5 animate-spin mx-auto mb-2" />
@@ -293,7 +293,7 @@ const SearchWithSuggestions = ({
 
       {/* No results message */}
       {showSuggestions && !isSearching && suggestions.length === 0 && searchQuery.length >= 2 && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white border border-border rounded-lg shadow-lg p-4 text-center">
+        <div className="absolute top-full left-0 right-0 z-[9999] mt-2 bg-white border border-border rounded-lg shadow-2xl backdrop-blur-sm p-4 text-center">
           <AlertCircle className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">
             Nenhuma empresa encontrada para "{searchQuery}"
