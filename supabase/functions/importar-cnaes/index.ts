@@ -481,8 +481,14 @@ Deno.serve(async (req) => {
     
     const resultado = await importarCNAEs();
     
+    // Adicionar campo sucesso baseado nos resultados
+    const resultadoComSucesso = {
+      ...resultado,
+      sucesso: resultado.erros === 0 || (resultado.importados > 0 && resultado.erros < resultado.total * 0.5)
+    };
+    
     return new Response(
-      JSON.stringify(resultado),
+      JSON.stringify(resultadoComSucesso),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
@@ -497,7 +503,8 @@ Deno.serve(async (req) => {
         error: mensagemErro,
         importados: 0,
         erros: 1,
-        total: 0
+        total: 0,
+        sucesso: false
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

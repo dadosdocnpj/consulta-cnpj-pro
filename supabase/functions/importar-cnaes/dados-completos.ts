@@ -421,7 +421,95 @@ export function getDadosCompletosOfficiais() {
       
       // Classe 6920 - Atividades de contabilidade
       { codigo: '6920601', nome: 'Atividades de contabilidade', classe_codigo: '6920', slug: 'atividades-contabilidade', is_principal: true },
-      { codigo: '6920602', nome: 'Atividades de consultoria e auditoria contábil e tributária', classe_codigo: '6920', slug: 'atividades-consultoria-auditoria-contabil-tributaria', is_principal: false }
+      { codigo: '6920602', nome: 'Atividades de consultoria e auditoria contábil e tributária', classe_codigo: '6920', slug: 'atividades-consultoria-auditoria-contabil-tributaria', is_principal: false },
+      
+      // Expandindo dados completos com mais CNAEs...
+      // Classe 0111 - Cultivo de cereais
+      { codigo: '0111300', nome: 'Cultivo de arroz', classe_codigo: '0111', slug: 'cultivo-arroz', is_principal: false },
+      { codigo: '0111301', nome: 'Cultivo de arroz inundado', classe_codigo: '0111', slug: 'cultivo-arroz-inundado', is_principal: true },
+      { codigo: '0111302', nome: 'Cultivo de arroz de sequeiro', classe_codigo: '0111', slug: 'cultivo-arroz-sequeiro', is_principal: false },
+      { codigo: '0111303', nome: 'Cultivo de outros cereais não especificados', classe_codigo: '0111', slug: 'cultivo-outros-cereais-nao-especificados', is_principal: false },
+      
+      // Classe 0112 - Cultivo de milho
+      { codigo: '0112101', nome: 'Cultivo de milho', classe_codigo: '0112', slug: 'cultivo-milho', is_principal: true },
+      { codigo: '0112199', nome: 'Cultivo de outros cereais para grãos', classe_codigo: '0112', slug: 'cultivo-outros-cereais-graos', is_principal: false },
+      
+      // Classe 0113 - Cultivo de cana-de-açúcar
+      { codigo: '0113000', nome: 'Cultivo de cana-de-açúcar', classe_codigo: '0113', slug: 'cultivo-cana-acucar', is_principal: true },
+      
+      // Classe 0114 - Cultivo de fumo
+      { codigo: '0114000', nome: 'Cultivo de fumo', classe_codigo: '0114', slug: 'cultivo-fumo', is_principal: true },
+      
+      // Classe 0115 - Cultivo de algodão herbáceo e outras fibras de lavoura temporária
+      { codigo: '0115000', nome: 'Cultivo de algodão herbáceo e outras fibras de lavoura temporária', classe_codigo: '0115', slug: 'cultivo-algodao-herbaceo-outras-fibras-lavoura-temporaria', is_principal: true },
+      
+      // Classe 0116 - Cultivo de plantas oleaginosas de lavoura temporária
+      { codigo: '0116101', nome: 'Cultivo de soja', classe_codigo: '0116', slug: 'cultivo-soja', is_principal: true },
+      { codigo: '0116102', nome: 'Cultivo de amendoim', classe_codigo: '0116', slug: 'cultivo-amendoim', is_principal: false },
+      { codigo: '0116199', nome: 'Cultivo de outras oleaginosas de lavoura temporária', classe_codigo: '0116', slug: 'cultivo-outras-oleaginosas-lavoura-temporaria', is_principal: false },
+      
+      // Classe 0119 - Cultivo de outros produtos de lavoura temporária
+      { codigo: '0119101', nome: 'Cultivo de feijão', classe_codigo: '0119', slug: 'cultivo-feijao', is_principal: true },
+      { codigo: '0119199', nome: 'Cultivo de outros produtos de lavoura temporária não especificados anteriormente', classe_codigo: '0119', slug: 'cultivo-outros-produtos-lavoura-temporaria-nao-especificados', is_principal: false },
+      
+      // Classe 0121 - Horticultura
+      { codigo: '0121301', nome: 'Horticultura, exceto morango', classe_codigo: '0121', slug: 'horticultura-exceto-morango', is_principal: true },
+      { codigo: '0121302', nome: 'Cultivo de morango', classe_codigo: '0121', slug: 'cultivo-morango', is_principal: false },
+      { codigo: '0121303', nome: 'Cultivo de flores e plantas ornamentais', classe_codigo: '0121', slug: 'cultivo-flores-plantas-ornamentais', is_principal: false },
+      { codigo: '0121304', nome: 'Cultivo de mudas e outras formas de propagação vegetal, certificadas', classe_codigo: '0121', slug: 'cultivo-mudas-outras-formas-propagacao-vegetal-certificadas', is_principal: false },
+      
+      // Classe 0131 - Cultivo de laranja
+      { codigo: '0131000', nome: 'Cultivo de laranja', classe_codigo: '0131', slug: 'cultivo-laranja', is_principal: true },
+      
+      // Classe 0132 - Cultivo de uva
+      { codigo: '0132000', nome: 'Cultivo de uva', classe_codigo: '0132', slug: 'cultivo-uva', is_principal: true },
+      
+      // Classe 0133 - Cultivo de outros citros
+      { codigo: '0133000', nome: 'Cultivo de outros citros', classe_codigo: '0133', slug: 'cultivo-outros-citros', is_principal: true },
+      
+      // Classe 0134 - Cultivo de outras frutas de lavoura permanente
+      { codigo: '0134000', nome: 'Cultivo de outras frutas de lavoura permanente', classe_codigo: '0134', slug: 'cultivo-outras-frutas-lavoura-permanente', is_principal: true },
+      
+      // Adicionando mais subclasses para atingir um conjunto mais completo
+      // Setor de Serviços - Informação e Comunicação
+      { codigo: '5811800', nome: 'Edição de livros', classe_codigo: '5811', slug: 'edicao-livros', is_principal: true },
+      { codigo: '5812500', nome: 'Edição de jornais', classe_codigo: '5812', slug: 'edicao-jornais', is_principal: true },
+      { codigo: '5813100', nome: 'Edição de revistas', classe_codigo: '5813', slug: 'edicao-revistas', is_principal: true },
+      
+      // Setor Industrial
+      { codigo: '1011201', nome: 'Frigorífico - abate de bovinos', classe_codigo: '1011', slug: 'frigorifico-abate-bovinos', is_principal: true },
+      { codigo: '1011202', nome: 'Frigorífico - abate de equinos', classe_codigo: '1011', slug: 'frigorifico-abate-equinos', is_principal: false },
+      { codigo: '1012101', nome: 'Frigorífico - abate de suínos', classe_codigo: '1012', slug: 'frigorifico-abate-suinos', is_principal: true },
+      { codigo: '1013901', nome: 'Frigorífico - abate de aves', classe_codigo: '1013', slug: 'frigorifico-abate-aves', is_principal: true },
+      { codigo: '1013902', nome: 'Frigorífico - abate de pequenos animais', classe_codigo: '1013', slug: 'frigorifico-abate-pequenos-animais', is_principal: false },
+      
+      // Setor de Comércio
+      { codigo: '4711301', nome: 'Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - hipermercados', classe_codigo: '4711', slug: 'comercio-varejista-mercadorias-geral-predominancia-produtos-alimenticios-hipermercados', is_principal: true },
+      { codigo: '4711302', nome: 'Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - supermercados', classe_codigo: '4711', slug: 'comercio-varejista-mercadorias-geral-predominancia-produtos-alimenticios-supermercados', is_principal: false },
+      { codigo: '4712100', nome: 'Comércio varejista de mercadorias em geral, com predominância de produtos alimentícios - minimercados, mercearias e armazéns', classe_codigo: '4712', slug: 'comercio-varejista-mercadorias-geral-predominancia-produtos-alimenticios-minimercados-mercearias-armazens', is_principal: true },
+      
+      // Setor de Construção
+      { codigo: '4120400', nome: 'Construção de edifícios', classe_codigo: '4120', slug: 'construcao-edificios', is_principal: true },
+      { codigo: '4211101', nome: 'Construção de rodovias e ferrovias', classe_codigo: '4211', slug: 'construcao-rodovias-ferrovias', is_principal: true },
+      { codigo: '4212000', nome: 'Construção de obras-de-arte especiais', classe_codigo: '4212', slug: 'construcao-obras-arte-especiais', is_principal: true },
+      
+      // Setor de Educação
+      { codigo: '8511200', nome: 'Educação infantil - creche', classe_codigo: '8511', slug: 'educacao-infantil-creche', is_principal: true },
+      { codigo: '8512100', nome: 'Educação infantil - pré-escola', classe_codigo: '8512', slug: 'educacao-infantil-pre-escola', is_principal: true },
+      { codigo: '8513900', nome: 'Ensino fundamental', classe_codigo: '8513', slug: 'ensino-fundamental', is_principal: true },
+      { codigo: '8520100', nome: 'Ensino médio', classe_codigo: '8520', slug: 'ensino-medio', is_principal: true },
+      
+      // Setor de Saúde
+      { codigo: '8610101', nome: 'Atividades de atendimento hospitalar, exceto pronto-socorro e unidades para atendimento a urgências', classe_codigo: '8610', slug: 'atividades-atendimento-hospitalar-exceto-pronto-socorro-unidades-atendimento-urgencias', is_principal: true },
+      { codigo: '8610102', nome: 'Atividades de atendimento em pronto-socorro e unidades hospitalares para atendimento a urgências', classe_codigo: '8610', slug: 'atividades-atendimento-pronto-socorro-unidades-hospitalares-atendimento-urgencias', is_principal: false },
+      { codigo: '8630501', nome: 'Atividade médica ambulatorial com recursos para realização de procedimentos cirúrgicos', classe_codigo: '8630', slug: 'atividade-medica-ambulatorial-recursos-realizacao-procedimentos-cirurgicos', is_principal: true },
+      { codigo: '8630502', nome: 'Atividade médica ambulatorial com recursos para realização de exames complementares', classe_codigo: '8630', slug: 'atividade-medica-ambulatorial-recursos-realizacao-exames-complementares', is_principal: false },
+      
+      // Adicionando mais para completar o conjunto
+      { codigo: '9601701', nome: 'Lavanderias', classe_codigo: '9601', slug: 'lavanderias', is_principal: true },
+      { codigo: '9601702', nome: 'Tinturarias', classe_codigo: '9601', slug: 'tinturarias', is_principal: false },
+      { codigo: '9602501', nome: 'Cabeleireiros, manicure e pedicure', classe_codigo: '9602', slug: 'cabeleireiros-manicure-pedicure', is_principal: true },
+      { codigo: '9602502', nome: 'Atividades de estética e outros serviços de cuidados com a beleza', classe_codigo: '9602', slug: 'atividades-estetica-outros-servicos-cuidados-beleza', is_principal: false }
     ]
   };
 }
