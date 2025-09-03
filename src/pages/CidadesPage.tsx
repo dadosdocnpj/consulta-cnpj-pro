@@ -50,7 +50,7 @@ const CidadesPage = () => {
                 <Link
                   key={cidadeInfo.municipio}
                   to={`/estados/${uf}/${citySlug}`}
-                >)
+                >
                 <Card className="hover:shadow-md transition-shadow cursor-pointer">
                   <CardHeader className="pb-3">
                     <CardTitle className="flex items-center space-x-2">
