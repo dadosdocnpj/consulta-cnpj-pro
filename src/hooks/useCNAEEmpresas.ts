@@ -15,7 +15,7 @@ export const useCNAEEmpresas = (cnaeCode: string, page: number = 1, limit: numbe
         const { data, error, count } = await supabase
           .from('cnpj_cache')
           .select('json_data', { count: 'exact' })
-          .or(`json_data->'cnae_principal'->>'codigo'.eq.${cnaeCode},json_data->'cnaes_secundarios' @> '[{"codigo":"${cnaeCode}"}]'`)
+          .or(`json_data->'cnae_principal'->>'codigo'.eq.${cnaeCode},json_data->'cnaes_secundarios' @> '${JSON.stringify([{codigo: cnaeCode}])}'`)
           .range((page - 1) * limit, page * limit - 1)
           .order('created_at', { ascending: false });
 
