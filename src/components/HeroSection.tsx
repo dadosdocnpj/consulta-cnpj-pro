@@ -4,9 +4,9 @@ import SearchWithSuggestions from "@/components/SearchWithSuggestions";
 const HeroSection = () => {
 
   return (
-    <section className="relative bg-gradient-hero py-16 md:py-20 overflow-hidden">
+    <section className="relative bg-gradient-hero py-16 md:py-20">
       {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-float"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/5 rounded-full blur-3xl animate-float" style={{animationDelay: '2s'}}></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-float" style={{animationDelay: '4s'}}></div>
@@ -30,12 +30,14 @@ const HeroSection = () => {
           </div>
 
           {/* Main Search Card */}
-          <div className="bg-white/95 backdrop-blur-xl border border-white/30 rounded-2xl p-8 max-w-3xl mx-auto mb-16 animate-slide-up shadow-2xl" style={{animationDelay: '0.3s'}}>
-            <SearchWithSuggestions 
-              variant="hero"
-              size="lg"
-              placeholder="Ex: Petrobras, 11.222.333/0001-81 ou Magazine Luiza"
-            />
+          <div className="relative max-w-3xl mx-auto mb-16 animate-slide-up" style={{animationDelay: '0.3s'}}>
+            <div className="bg-white/95 backdrop-blur-xl border border-white/30 rounded-2xl p-8 shadow-2xl">
+              <SearchWithSuggestions 
+                variant="hero"
+                size="lg"
+                placeholder="Ex: Petrobras, 11.222.333/0001-81 ou Magazine Luiza"
+              />
+            </div>
           </div>
 
           {/* Feature highlights */}
