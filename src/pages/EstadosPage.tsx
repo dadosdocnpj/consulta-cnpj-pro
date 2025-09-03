@@ -1,11 +1,18 @@
 import { Link } from "react-router-dom";
-import { MapPin, Users } from "lucide-react";
+import { MapPin, Building2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import PageLayout from "@/components/PageLayout";
 import { estados, regioes, getEstadosPorRegiao } from "@/data/estados";
+import { useContadoresEstados } from "@/hooks/useContadoresEstados";
 
 const EstadosPage = () => {
+  const { data: contadores, isLoading } = useContadoresEstados();
+  
+  const getEmpresasCount = (uf: string) => {
+    const contador = contadores?.find(c => c.uf === uf);
+    return contador?.count || 0;
+  };
   return (
     <PageLayout
       title="Estados Brasileiros"
@@ -43,9 +50,13 @@ const EstadosPage = () => {
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-0">
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Users className="h-4 w-4 mr-2" />
-                          <span>Ver empresas por cidade</span>
+                        <div className="flex items-center space-x-2 text-muted-foreground">
+                          <Building2 className="h-4 w-4" />
+                          <span className="text-sm">
+                            {isLoading ? 'Carregando...' : (
+                              `${getEmpresasCount(estado.uf)} ${getEmpresasCount(estado.uf) === 1 ? 'empresa' : 'empresas'}`
+                            )}
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
