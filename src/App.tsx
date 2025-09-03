@@ -16,6 +16,7 @@ import TopEmpresasPage from "./pages/TopEmpresasPage";
 import EmpresasRecentesPage from "./pages/EmpresasRecentesPage";
 import StartupsPage from "./pages/StartupsPage";
 import EmpresasPublicasPage from "./pages/EmpresasPublicasPage";
+import CNAEImportPage from "./pages/CNAEImportPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/categoria/startups" element={<StartupsPage />} />
             <Route path="/categoria/publicas" element={<EmpresasPublicasPage />} />
             <Route path="/admin/import" element={<ExecuteImport />} />
+            <Route path="/admin/importar-cnaes" element={<CNAEImportPage />} />
             <Route path="/:slug" element={<Index />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
