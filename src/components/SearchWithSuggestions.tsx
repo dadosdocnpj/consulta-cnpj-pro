@@ -163,11 +163,24 @@ const SearchWithSuggestions = ({
                 ? "bg-white border-2" 
                 : "bg-background/50"
             } ${
-              !isValidInput 
+              !isValidInput || searchError
                 ? 'border-destructive focus:border-destructive focus:ring-destructive/20' 
                 : 'border-input focus:border-primary focus:ring-primary/20'
             } ${variant === "hero" ? "rounded-xl" : "rounded-lg"} font-medium text-foreground placeholder:text-muted-foreground search-glow transition-all duration-300`}
+            aria-invalid={!isValidInput || !!searchError}
+            aria-describedby={searchError ? "search-error" : undefined}
           />
+          
+          {/* Validation indicator */}
+          {searchQuery && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              {!isValidInput || searchError ? (
+                <AlertCircle className="h-5 w-5 text-destructive" />
+              ) : detectInputType(searchQuery) === 'cnpj' && isValidCNPJ(searchQuery) ? (
+                <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+              ) : null}
+            </div>
+          )}
         </div>
         
         <Button

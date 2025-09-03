@@ -46,11 +46,13 @@ serve(async (req) => {
     const isNumericQuery = /^\d+$/.test(query.replace(/\D/g, ''));
     const cleanedNumbers = query.replace(/\D/g, '');
     
+    console.log('Tipo de busca:', isNumericQuery ? 'CNPJ' : 'Nome', 'Números limpos:', cleanedNumbers);
+    
     let data, error;
     
     if (isNumericQuery && cleanedNumbers.length >= 8) {
       // Busca por CNPJ (completo ou parcial)
-      console.log('Buscando por CNPJ:', cleanedNumbers);
+      console.log('Executando busca por CNPJ:', cleanedNumbers);
       
       const searchResult = await supabaseClient
         .from('cnpj_cache')
@@ -61,9 +63,10 @@ serve(async (req) => {
         
       data = searchResult.data;
       error = searchResult.error;
+      console.log('Resultado busca CNPJ - encontrados:', data?.length || 0);
     } else {
       // Busca por nome da empresa
-      console.log('Buscando por nome da empresa');
+      console.log('Executando busca por nome da empresa');
       
       const searchResult = await supabaseClient
         .from('cnpj_cache')
@@ -74,6 +77,7 @@ serve(async (req) => {
         
       data = searchResult.data;
       error = searchResult.error;
+      console.log('Resultado busca nome - encontrados:', data?.length || 0);
     }
 
     if (error) {
@@ -85,6 +89,8 @@ serve(async (req) => {
 
     const suggestions = data?.map(item => {
       const empresa = item.json_data as any;
+      console.log('Processando empresa:', empresa.razao_social);
+      
       return {
         cnpj: item.cnpj,
         slug: item.slug,

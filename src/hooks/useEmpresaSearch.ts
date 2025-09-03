@@ -22,15 +22,23 @@ export const useEmpresaSearch = () => {
   const [suggestions, setSuggestions] = useState<EmpresaSuggestion[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastQuery, setLastQuery] = useState<string>('');
 
   const searchEmpresas = useCallback(async (query: string, limit: number = 10) => {
     if (!query || query.length < 2) {
       setSuggestions([]);
+      setError(null);
+      return;
+    }
+
+    // Evitar busca duplicada
+    if (query === lastQuery && suggestions.length > 0) {
       return;
     }
 
     setIsSearching(true);
     setError(null);
+    setLastQuery(query);
 
     try {
       const { data, error } = await supabase.functions.invoke('empresa-search', {
@@ -43,19 +51,34 @@ export const useEmpresaSearch = () => {
       }
 
       console.log('Resposta da busca:', data);
-      setSuggestions(data?.suggestions || []);
+      
+      if (data?.suggestions) {
+        setSuggestions(data.suggestions);
+        
+        // Log para debugging
+        if (data.suggestions.length === 0) {
+          console.log('Nenhuma empresa encontrada para:', query);
+        } else {
+          console.log(`${data.suggestions.length} empresas encontradas para:`, query);
+        }
+      } else {
+        setSuggestions([]);
+        setError('Resposta inválida do servidor');
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erro desconhecido na busca';
+      console.error('Erro na busca de empresas:', errorMessage);
       setError(errorMessage);
       setSuggestions([]);
     } finally {
       setIsSearching(false);
     }
-  }, []);
+  }, [lastQuery, suggestions.length]);
 
   const clearSuggestions = useCallback(() => {
     setSuggestions([]);
     setError(null);
+    setLastQuery('');
   }, []);
 
   return {
