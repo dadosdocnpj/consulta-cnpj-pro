@@ -331,6 +331,7 @@ async function importarSubclasses(subclasses: CNAESubclasse[]): Promise<{ import
             descricao: subclasse.descricao,
             slug: subclasse.slug || criarSlug(subclasse.nome),
             classe_id: classeExiste.id,
+            is_principal: (subclasse as any).is_principal || false,
             total_empresas: 0
           }, {
             onConflict: 'codigo'
@@ -363,23 +364,24 @@ async function importarCNAEs(): Promise<ResultadoImportacao> {
 
     // 2. Obter dados completos oficiais
     console.log('📥 Carregando dados CNAEs oficiais completos...');
-    const { secoesCNAE, divisoesCNAE, gruposCNAE, classesCNAE, subclassesCNAE } = getDadosCompletosOfficiais();
+    const dadosCompletos = getDadosCompletosOfficiais();
+    const { secoes, divisoes, grupos, classes, subclasses } = dadosCompletos;
 
     console.log(`📊 Dados carregados:
-    - ${secoesCNAE.length} seções
-    - ${divisoesCNAE.length} divisões  
-    - ${gruposCNAE.length} grupos
-    - ${classesCNAE.length} classes
-    - ${subclassesCNAE.length} subclasses`);
+    - ${secoes.length} seções
+    - ${divisoes.length} divisões  
+    - ${grupos.length} grupos
+    - ${classes.length} classes
+    - ${subclasses.length} subclasses`);
 
     // 3. Importar em ordem hierárquica
     console.log('🔄 Iniciando importação hierárquica...');
 
-    const resultadoSecoes = await importarSecoes(secoesCNAE);
-    const resultadoDivisoes = await importarDivisoes(divisoesCNAE);
-    const resultadoGrupos = await importarGrupos(gruposCNAE);
-    const resultadoClasses = await importarClasses(classesCNAE);
-    const resultadoSubclasses = await importarSubclasses(subclassesCNAE);
+    const resultadoSecoes = await importarSecoes(secoes);
+    const resultadoDivisoes = await importarDivisoes(divisoes);
+    const resultadoGrupos = await importarGrupos(grupos);
+    const resultadoClasses = await importarClasses(classes);
+    const resultadoSubclasses = await importarSubclasses(subclasses);
 
     // 4. Compilar resultados
     const totalImportados = 
@@ -397,11 +399,11 @@ async function importarCNAEs(): Promise<ResultadoImportacao> {
       resultadoSubclasses.erros;
 
     const totalProcessados = 
-      secoesCNAE.length + 
-      divisoesCNAE.length + 
-      gruposCNAE.length + 
-      classesCNAE.length + 
-      subclassesCNAE.length;
+      secoes.length + 
+      divisoes.length + 
+      grupos.length + 
+      classes.length + 
+      subclasses.length;
 
     const duracaoMs = Date.now() - inicioImportacao;
     const duracao = Math.round(duracaoMs / 1000);
@@ -412,11 +414,11 @@ async function importarCNAEs(): Promise<ResultadoImportacao> {
     📊 Total processados: ${totalProcessados}
     
     📋 Detalhes por categoria:
-    - Seções: ${resultadoSecoes.importados}/${secoesCNAE.length} (${resultadoSecoes.erros} erros)
-    - Divisões: ${resultadoDivisoes.importados}/${divisoesCNAE.length} (${resultadoDivisoes.erros} erros)
-    - Grupos: ${resultadoGrupos.importados}/${gruposCNAE.length} (${resultadoGrupos.erros} erros)
-    - Classes: ${resultadoClasses.importados}/${classesCNAE.length} (${resultadoClasses.erros} erros)
-    - Subclasses: ${resultadoSubclasses.importados}/${subclassesCNAE.length} (${resultadoSubclasses.erros} erros)`);
+    - Seções: ${resultadoSecoes.importados}/${secoes.length} (${resultadoSecoes.erros} erros)
+    - Divisões: ${resultadoDivisoes.importados}/${divisoes.length} (${resultadoDivisoes.erros} erros)
+    - Grupos: ${resultadoGrupos.importados}/${grupos.length} (${resultadoGrupos.erros} erros)
+    - Classes: ${resultadoClasses.importados}/${classes.length} (${resultadoClasses.erros} erros)
+    - Subclasses: ${resultadoSubclasses.importados}/${subclasses.length} (${resultadoSubclasses.erros} erros)`);
 
     // Log dos primeiros erros se houver
     const todosErros = [
