@@ -76,9 +76,65 @@ export const isValidCNPJ = (cnpj: string): boolean => {
 export const normalizeCNPJInput = (input: string): { type: 'cnpj' | 'name', value: string } => {
   const cleaned = cleanCNPJ(input);
   
+  // Verifica se é um CNPJ completo (14 dígitos)
   if (cleaned.length === 14 && /^\d{14}$/.test(cleaned)) {
     return { type: 'cnpj', value: cleaned };
   }
   
+  // Verifica se pode ser um CNPJ parcial (mínimo 8 dígitos para considerar)
+  if (cleaned.length >= 8 && /^\d+$/.test(cleaned)) {
+    return { type: 'cnpj', value: cleaned };
+  }
+  
   return { type: 'name', value: input.trim() };
+};
+
+/**
+ * Valida se é um CNPJ parcial válido
+ */
+export const isPartialCNPJ = (input: string): boolean => {
+  const cleaned = cleanCNPJ(input);
+  return cleaned.length >= 8 && cleaned.length <= 14 && /^\d+$/.test(cleaned);
+};
+
+/**
+ * Detecta se o input é mais provavelmente um CNPJ ou nome
+ */
+export const detectInputType = (input: string): 'cnpj' | 'name' | 'partial_cnpj' => {
+  const cleaned = cleanCNPJ(input);
+  
+  if (cleaned.length === 14) {
+    return 'cnpj';
+  }
+  
+  if (cleaned.length >= 8 && /^\d+$/.test(cleaned)) {
+    return 'partial_cnpj';
+  }
+  
+  return 'name';
+};
+
+/**
+ * Gera mensagem de erro específica para CNPJ
+ */
+export const getCNPJErrorMessage = (cnpj: string): string => {
+  const cleaned = cleanCNPJ(cnpj);
+  
+  if (cleaned.length === 0) {
+    return 'Digite um CNPJ válido';
+  }
+  
+  if (cleaned.length < 14) {
+    return 'CNPJ deve ter 14 dígitos';
+  }
+  
+  if (cleaned.length > 14) {
+    return 'CNPJ não pode ter mais de 14 dígitos';
+  }
+  
+  if (!isValidCNPJ(cleaned)) {
+    return 'CNPJ inválido - verifique os dígitos';
+  }
+  
+  return 'CNPJ não encontrado';
 };

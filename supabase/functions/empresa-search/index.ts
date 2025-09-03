@@ -42,31 +42,58 @@ serve(async (req) => {
     
     console.log('Query escapada:', escapedQuery);
     
-    // Buscar por nome da empresa (ILIKE para busca aproximada)
-    // Sintaxe corrigida para o .or() do Supabase
-    const { data, error } = await supabaseClient
-      .from('cnpj_cache')
-      .select('json_data, cnpj, slug')
-      .or(`json_data->>razao_social.ilike.%${escapedQuery}%,json_data->>nome_fantasia.ilike.%${escapedQuery}%`)
-      .limit(limit)
-      .order('created_at', { ascending: false });
+    // Detectar se é CNPJ (apenas números) ou nome da empresa
+    const isNumericQuery = /^\d+$/.test(query.replace(/\D/g, ''));
+    const cleanedNumbers = query.replace(/\D/g, '');
+    
+    let data, error;
+    
+    if (isNumericQuery && cleanedNumbers.length >= 8) {
+      // Busca por CNPJ (completo ou parcial)
+      console.log('Buscando por CNPJ:', cleanedNumbers);
+      
+      const searchResult = await supabaseClient
+        .from('cnpj_cache')
+        .select('json_data, cnpj, slug')
+        .ilike('cnpj', `${cleanedNumbers}%`)
+        .limit(limit)
+        .order('created_at', { ascending: false });
+        
+      data = searchResult.data;
+      error = searchResult.error;
+    } else {
+      // Busca por nome da empresa
+      console.log('Buscando por nome da empresa');
+      
+      const searchResult = await supabaseClient
+        .from('cnpj_cache')
+        .select('json_data, cnpj, slug')
+        .or(`json_data->>razao_social.ilike.%${escapedQuery}%,json_data->>nome_fantasia.ilike.%${escapedQuery}%`)
+        .limit(limit)
+        .order('created_at', { ascending: false });
+        
+      data = searchResult.data;
+      error = searchResult.error;
+    }
 
     if (error) {
       console.error('Erro na busca:', error);
       throw error;
     }
 
+    console.log('Dados encontrados:', data?.length || 0);
+
     const suggestions = data?.map(item => {
       const empresa = item.json_data as any;
       return {
         cnpj: item.cnpj,
         slug: item.slug,
-        razao_social: empresa.razao_social,
-        nome_fantasia: empresa.nome_fantasia,
-        cnae_principal: empresa.cnae_principal?.texto,
-        situacao: empresa.situacao,
-        uf: empresa.uf,
-        municipio: empresa.municipio
+        razao_social: empresa.razao_social || 'N/A',
+        nome_fantasia: empresa.nome_fantasia || null,
+        cnae_principal: empresa.cnae_principal?.texto || empresa.cnae_principal?.descricao || null,
+        situacao: empresa.situacao_cadastral || empresa.situacao || 'N/A',
+        uf: empresa.endereco?.uf || empresa.uf || 'N/A',
+        municipio: empresa.endereco?.municipio || empresa.municipio || 'N/A'
       };
     }) || [];
 

@@ -1,11 +1,12 @@
-import { Search, Loader2, Building2 } from "lucide-react";
+import { Search, Loader2, Building2, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCNPJLookup } from "@/hooks/useCNPJLookup";
 import { useEmpresaSearch } from "@/hooks/useEmpresaSearch";
-import { isValidCNPJFormat, normalizeCNPJInput } from "@/utils/cnpj";
+import { isValidCNPJFormat, isValidCNPJ, normalizeCNPJInput, detectInputType, getCNPJErrorMessage } from "@/utils/cnpj";
 
 interface SearchWithSuggestionsProps {
   placeholder?: string;
@@ -23,20 +24,33 @@ const SearchWithSuggestions = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isValidInput, setIsValidInput] = useState(true);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   
-  const { lookupCNPJ, isLoading: isCNPJLoading, data, isSuccess } = useCNPJLookup();
-  const { suggestions, isSearching, searchEmpresas, clearSuggestions } = useEmpresaSearch();
+  const { lookupCNPJ, isLoading: isCNPJLoading, data, isSuccess, isError, error } = useCNPJLookup();
+  const { suggestions, isSearching, error: searchingError, searchEmpresas, clearSuggestions } = useEmpresaSearch();
 
   const validateInput = (input: string) => {
     if (!input.trim()) return true;
     
-    const normalized = normalizeCNPJInput(input);
-    if (normalized.type === 'cnpj') {
-      return isValidCNPJFormat(normalized.value);
+    const inputType = detectInputType(input);
+    if (inputType === 'cnpj') {
+      return isValidCNPJ(input);
     }
     return true;
+  };
+
+  const getErrorMessage = (input: string): string | null => {
+    if (!input.trim()) return null;
+    
+    const inputType = detectInputType(input);
+    if (inputType === 'cnpj') {
+      if (!isValidCNPJ(input)) {
+        return getCNPJErrorMessage(input);
+      }
+    }
+    return null;
   };
 
   // Debounce para evitar muitas requisições
@@ -45,20 +59,29 @@ const SearchWithSuggestions = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchQuery(value);
-    setIsValidInput(validateInput(value));
+    setSearchError(null);
+    
+    const isValid = validateInput(value);
+    setIsValidInput(isValid);
 
     // Limpar timeout anterior
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
     }
 
-    // Se não for CNPJ válido, buscar sugestões por nome
-    const normalized = normalizeCNPJInput(value);
-    if (normalized.type !== 'cnpj' && value.length >= 2) {
+    // Busca inteligente baseada no tipo de input
+    const inputType = detectInputType(value);
+    
+    if (value.length >= 2) {
       // Adicionar debounce de 300ms
       debounceTimeout.current = setTimeout(() => {
-        searchEmpresas(value, 8);
-        setShowSuggestions(true);
+        if (inputType === 'name' || inputType === 'partial_cnpj') {
+          searchEmpresas(value, 8);
+          setShowSuggestions(true);
+        } else {
+          clearSuggestions();
+          setShowSuggestions(false);
+        }
       }, 300);
     } else {
       clearSuggestions();
@@ -67,10 +90,26 @@ const SearchWithSuggestions = ({
   };
 
   const handleSearch = async () => {
-    if (!searchQuery.trim() || !validateInput(searchQuery)) return;
+    if (!searchQuery.trim()) {
+      setSearchError('Digite um CNPJ ou nome da empresa');
+      return;
+    }
     
-    const normalized = normalizeCNPJInput(searchQuery);
-    lookupCNPJ({ cnpj: normalized.value });
+    const inputType = detectInputType(searchQuery);
+    
+    if (inputType === 'cnpj') {
+      if (!isValidCNPJ(searchQuery)) {
+        setSearchError(getCNPJErrorMessage(searchQuery));
+        return;
+      }
+      const normalized = normalizeCNPJInput(searchQuery);
+      lookupCNPJ({ cnpj: normalized.value });
+    } else {
+      // Para nomes, fazer busca direta
+      searchEmpresas(searchQuery, 20);
+      setShowSuggestions(true);
+    }
+    
     setShowSuggestions(false);
   };
 
@@ -207,6 +246,16 @@ const SearchWithSuggestions = ({
         </div>
       )}
 
+      {/* Error feedback */}
+      {(searchError || (isError && error) || searchingError) && (
+        <Alert variant="destructive" className="mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {searchError || error?.message || searchingError || 'Erro na busca'}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Validation message */}
       {variant === "hero" && (
         <p className={`text-sm mt-4 transition-colors duration-200 ${
@@ -216,7 +265,8 @@ const SearchWithSuggestions = ({
         }`}>
           {!isValidInput ? (
             <>
-              <strong>CNPJ inválido:</strong> Digite um CNPJ com 14 dígitos ou o nome da empresa
+              <AlertCircle className="inline h-4 w-4 mr-1" />
+              <strong>CNPJ inválido:</strong> {getErrorMessage(searchQuery) || 'Digite um CNPJ válido ou nome da empresa'}
             </>
           ) : (
             <>
@@ -226,6 +276,19 @@ const SearchWithSuggestions = ({
             </>
           )}
         </p>
+      )}
+
+      {/* No results message */}
+      {showSuggestions && !isSearching && suggestions.length === 0 && searchQuery.length >= 2 && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white border border-border rounded-lg shadow-lg p-4 text-center">
+          <AlertCircle className="h-5 w-5 mx-auto mb-2 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">
+            Nenhuma empresa encontrada para "{searchQuery}"
+          </span>
+          <p className="text-xs text-muted-foreground mt-1">
+            Tente buscar por CNPJ completo ou verifique a grafia do nome
+          </p>
+        </div>
       )}
     </div>
   );
