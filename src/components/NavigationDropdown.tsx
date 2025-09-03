@@ -12,12 +12,15 @@ import {
 import { cn } from '@/lib/utils';
 import { useTopEmpresas } from '@/hooks/useTopEmpresas';
 import { useEmpresasRecentes } from '@/hooks/useEmpresasRecentes';
+import { useEmpresasPorCategoria } from '@/hooks/useEmpresasPorCategoria';
 import { cnaeSections } from '@/data/cnaes';
 import { estados } from '@/data/estados';
 
 const NavigationDropdown = () => {
   const { data: topEmpresas } = useTopEmpresas(5);
   const { data: empresasRecentes } = useEmpresasRecentes(5);
+  const { data: startups } = useEmpresasPorCategoria('startups', 5);
+  const { data: empresasPublicas } = useEmpresasPorCategoria('publicas', 5);
 
   const empresasLinks = [
     {
@@ -25,7 +28,7 @@ const NavigationDropdown = () => {
       href: "/ranking/top-empresas",
       description: "As maiores empresas do Brasil",
       icon: TrendingUp,
-      items: topEmpresas?.slice(0, 3).map(empresa => ({
+      items: topEmpresas?.slice(0, 5).map(empresa => ({
         name: empresa.razao_social,
         href: `/cnpj/${empresa.cnpj}`,
         cnpj: empresa.cnpj
@@ -36,7 +39,7 @@ const NavigationDropdown = () => {
       href: "/empresas-recentes",
       description: "Últimas empresas consultadas",
       icon: Building2,
-      items: empresasRecentes?.slice(0, 3).map(empresa => ({
+      items: empresasRecentes?.slice(0, 5).map(empresa => ({
         name: empresa.razao_social,
         href: `/cnpj/${empresa.cnpj}`,
         cnpj: empresa.cnpj
@@ -47,14 +50,22 @@ const NavigationDropdown = () => {
       href: "/categoria/startups",
       description: "Empresas de tecnologia e inovação",
       icon: Sparkles,
-      items: []
+      items: startups?.slice(0, 5).map(empresa => ({
+        name: empresa.razao_social,
+        href: `/cnpj/${empresa.cnpj}`,
+        cnpj: empresa.cnpj
+      })) || []
     },
     {
       title: "Empresas Públicas",
       href: "/categoria/publicas",
       description: "Setor público e autarquias",
       icon: Shield,
-      items: []
+      items: empresasPublicas?.slice(0, 5).map(empresa => ({
+        name: empresa.razao_social,
+        href: `/cnpj/${empresa.cnpj}`,
+        cnpj: empresa.cnpj
+      })) || []
     }
   ];
 
@@ -246,17 +257,6 @@ const NavigationDropdown = () => {
           </NavigationMenuContent>
         </NavigationMenuItem>
 
-        <NavigationMenuItem>
-          <Link 
-            to="/como-usar"
-            className={cn(
-              "group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-accent/50 data-[state=open]:bg-accent/50",
-              "text-foreground hover:text-primary transition-smooth font-medium"
-            )}
-          >
-            Como Usar
-          </Link>
-        </NavigationMenuItem>
       </NavigationMenuList>
     </NavigationMenu>
   );

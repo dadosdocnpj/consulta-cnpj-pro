@@ -13,20 +13,25 @@ export const useEmpresasPorCategoria = (categoria: 'startups' | 'publicas', limi
           .limit(limit);
 
         if (categoria === 'startups') {
-          // Filtrar por CNAEs típicos de startups tecnológicas
+          // Filtrar por CNAEs típicos de startups e tecnologia
           query = query.or(
             'json_data->atividade_principal->>codigo.like.62%,' +
             'json_data->atividade_principal->>codigo.like.63%,' +
             'json_data->atividade_principal->>codigo.like.58%,' +
-            'json_data->atividade_principal->>codigo.like.72%'
+            'json_data->atividade_principal->>codigo.like.72%,' +
+            'json_data->atividade_principal->>codigo.like.61%,' +
+            'json_data->atividade_principal->>codigo.like.59%,' +
+            'json_data->atividade_principal->>codigo.like.73%'
           );
         } else if (categoria === 'publicas') {
-          // Filtrar por natureza jurídica de empresas públicas
+          // Filtrar por natureza jurídica de empresas públicas (mais amplo)
           query = query.or(
-            'json_data->>natureza_juridica.ilike.%administra%publ%,' +
-            'json_data->>natureza_juridica.ilike.%empresa%publ%,' +
-            'json_data->>natureza_juridica.ilike.%autarqu%,' +
-            'json_data->>natureza_juridica.ilike.%fundacao%publ%'
+            'json_data->>natureza_juridica.ilike.%publ%,' +
+            'json_data->>natureza_juridica.ilike.%admin%,' +
+            'json_data->>natureza_juridica.ilike.%govern%,' +
+            'json_data->>natureza_juridica.ilike.%municipal%,' +
+            'json_data->>natureza_juridica.ilike.%estadual%,' +
+            'json_data->>natureza_juridica.ilike.%federal%'
           );
         }
 
