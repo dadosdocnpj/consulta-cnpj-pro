@@ -25,9 +25,18 @@ const EmpresaCard = ({ empresa }: EmpresaCardProps) => {
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-2">
             <Building2 className="h-5 w-5 text-primary" />
-            <h3 className="text-lg font-semibold line-clamp-1">
-              {empresa.nome_fantasia || empresa.razao_social}
-            </h3>
+            {empresa.slug ? (
+              <Link 
+                to={`/${empresa.slug}`}
+                className="text-lg font-semibold line-clamp-1 text-primary hover:underline"
+              >
+                {empresa.nome_fantasia || empresa.razao_social}
+              </Link>
+            ) : (
+              <h3 className="text-lg font-semibold line-clamp-1">
+                {empresa.nome_fantasia || empresa.razao_social}
+              </h3>
+            )}
           </div>
           <Badge variant={getSituacaoColor(empresa.situacao_cadastral)}>
             {empresa.situacao_cadastral || "N/A"}
@@ -68,14 +77,6 @@ const EmpresaCard = ({ empresa }: EmpresaCardProps) => {
           </div>
         )}
         
-        {empresa.slug && (
-          <Link 
-            to={`/${empresa.slug}`}
-            className="inline-block mt-2 text-primary hover:underline text-sm font-medium"
-          >
-            Ver detalhes →
-          </Link>
-        )}
       </CardContent>
     </Card>
   );

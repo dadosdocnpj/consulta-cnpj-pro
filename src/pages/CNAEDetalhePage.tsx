@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCNAEEmpresas } from "@/hooks/useCNAEEmpresas";
 import { popularCNAEs, cnaeGrupos } from "@/data/cnaes";
-import { Building2, MapPin, Calendar, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
+import { Building2, MapPin, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 const CNAEDetalhePage = () => {
@@ -131,9 +131,18 @@ const CNAEDetalhePage = () => {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="text-lg">
-                          {empresa.razao_social}
-                        </CardTitle>
+                        {empresa.slug ? (
+                          <Link 
+                            to={`/${empresa.slug}`}
+                            className="text-lg font-semibold text-primary hover:underline"
+                          >
+                            {empresa.razao_social}
+                          </Link>
+                        ) : (
+                          <CardTitle className="text-lg">
+                            {empresa.razao_social}
+                          </CardTitle>
+                        )}
                         {empresa.nome_fantasia && (
                           <CardDescription className="font-medium">
                             {empresa.nome_fantasia}
@@ -168,17 +177,6 @@ const CNAEDetalhePage = () => {
                         </div>
                       )}
                     </div>
-                    
-                    {empresa.slug && (
-                      <div className="mt-4">
-                        <Link to={`/cnpj/${empresa.slug}`}>
-                          <Button variant="outline" size="sm">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Ver detalhes
-                          </Button>
-                        </Link>
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
               ))}
