@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCNAEEmpresas } from "@/hooks/useCNAEEmpresas";
 import { popularCNAEs, cnaeGrupos } from "@/data/cnaes";
-import { Building2, MapPin, Calendar, ExternalLink } from "lucide-react";
+import { Building2, MapPin, Calendar, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 const CNAEDetalhePage = () => {
@@ -49,6 +49,24 @@ const CNAEDetalhePage = () => {
 
   const title = cnaeInfo ? `CNAE ${cnaeInfo.codigo} - ${cnaeInfo.nome}` : `CNAE ${cnaeCode}`;
   const description = cnaeInfo ? cnaeInfo.nome : `Detalhes da atividade econômica ${cnaeCode}`;
+  
+  const totalPages = data ? Math.ceil(data.total / 20) : 0;
+  
+  const getVisiblePages = () => {
+    if (totalPages <= 5) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    
+    if (currentPage <= 3) {
+      return [1, 2, 3, 4, 5];
+    }
+    
+    if (currentPage >= totalPages - 2) {
+      return [totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    }
+    
+    return [currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2];
+  };
 
   return (
     <PageLayout
@@ -165,24 +183,40 @@ const CNAEDetalhePage = () => {
                 </Card>
               ))}
               
-              {data.total > 20 && (
-                <div className="flex justify-center gap-2 mt-6">
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-6">
                   <Button
                     variant="outline"
+                    size="sm"
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     disabled={currentPage === 1}
                   >
+                    <ChevronLeft className="h-4 w-4" />
                     Anterior
                   </Button>
-                  <span className="px-4 py-2 text-sm text-muted-foreground">
-                    Página {currentPage} de {Math.ceil(data.total / 20)}
-                  </span>
+                  
+                  <div className="flex gap-1">
+                    {getVisiblePages().map((page) => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className="w-10"
+                      >
+                        {page}
+                      </Button>
+                    ))}
+                  </div>
+                  
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentPage(prev => prev + 1)}
-                    disabled={currentPage * 20 >= data.total}
+                    size="sm"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
                   >
-                    Próxima
+                    Próximo
+                    <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               )}
