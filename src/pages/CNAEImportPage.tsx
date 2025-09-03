@@ -33,9 +33,15 @@ export default function CNAEImportPage() {
       setProgress(100);
 
       if (error) {
-        throw error;
+        console.error('Erro na função:', error);
+        throw new Error(error.message || 'Erro na função de importação');
       }
 
+      if (!data) {
+        throw new Error('Nenhum dado retornado da função de importação');
+      }
+
+      console.log('Resultado da importação:', data);
       setImportResult(data);
       
       // Atualizar dados após importação
@@ -45,9 +51,10 @@ export default function CNAEImportPage() {
       console.error('Erro na importação:', error);
       setImportResult({
         sucesso: false,
-        erro: error.message || 'Erro desconhecido',
+        erro: error.message || 'Erro desconhecido na importação',
         importados: 0,
-        erros: 1
+        erros: 1,
+        total: 0
       });
     } finally {
       setIsImporting(false);
@@ -108,11 +115,11 @@ export default function CNAEImportPage() {
             
             <CardContent className="space-y-6">
               {!isImporting && !importResult && (
-                <Alert>
+                  <Alert>
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
                     Esta operação irá importar a estrutura hierárquica completa dos CNAEs brasileiros.
-                    Inclui 21 seções, divisões, grupos, classes e subclasses principais.
+                    Inclui 21 seções, 88 divisões, centenas de grupos, milhares de classes e ~1.355 subclasses.
                   </AlertDescription>
                 </Alert>
               )}
@@ -142,21 +149,48 @@ export default function CNAEImportPage() {
                       <>
                         <strong>Importação concluída com sucesso!</strong>
                         <br />
-                        Importados: {importResult.importados} registros
+                        ✅ Importados: {importResult.importados} registros
                         {importResult.erros > 0 && (
                           <>
                             <br />
-                            Erros: {importResult.erros} registros
+                            ❌ Erros: {importResult.erros} registros
                           </>
                         )}
                         <br />
-                        Total processado: {importResult.total} registros
+                        📊 Total processado: {importResult.total} registros
+                        {importResult.tempo && (
+                          <>
+                            <br />
+                            ⏱️ Tempo: {importResult.tempo}
+                          </>
+                        )}
+                        {importResult.detalhes && (
+                          <div className="mt-2 text-xs">
+                            <div>📋 Detalhes:</div>
+                            <div>• Seções: {importResult.detalhes.secoes?.importados || 0}</div>
+                            <div>• Divisões: {importResult.detalhes.divisoes?.importados || 0}</div>
+                            <div>• Grupos: {importResult.detalhes.grupos?.importados || 0}</div>
+                            <div>• Classes: {importResult.detalhes.classes?.importados || 0}</div>
+                            <div>• Subclasses: {importResult.detalhes.subclasses?.importados || 0}</div>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <>
                         <strong>Erro na importação:</strong>
                         <br />
                         {importResult.erro}
+                        {importResult.detalhesErros && importResult.detalhesErros.length > 0 && (
+                          <div className="mt-2 text-xs">
+                            <div>Detalhes dos erros:</div>
+                            {importResult.detalhesErros.slice(0, 5).map((erro, i) => (
+                              <div key={i}>• {erro}</div>
+                            ))}
+                            {importResult.detalhesErros.length > 5 && (
+                              <div>... e mais {importResult.detalhesErros.length - 5} erros</div>
+                            )}
+                          </div>
+                        )}
                       </>
                     )}
                   </AlertDescription>
@@ -209,22 +243,22 @@ export default function CNAEImportPage() {
                       21 grandes setores da economia, de Agricultura (A) a Organismos Internacionais (U)
                     </p>
                   </div>
-                  <div className="p-4 border rounded-lg">
+                    <div className="p-4 border rounded-lg">
                     <h4 className="font-semibold mb-2">📊 Divisões (2 dígitos)</h4>
                     <p className="text-sm text-muted-foreground">
-                      Subdivisões das seções, totalizando cerca de 88 atividades econômicas
+                      Subdivisões das seções, totalizando exatamente 88 atividades econômicas
                     </p>
                   </div>
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-semibold mb-2">🔗 Grupos (3 dígitos)</h4>
                     <p className="text-sm text-muted-foreground">
-                      Agrupamentos mais específicos, totalizando cerca de 272 categorias
+                      Agrupamentos mais específicos, com centenas de categorias organizadas
                     </p>
                   </div>
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-semibold mb-2">📋 Classes (4 dígitos)</h4>
                     <p className="text-sm text-muted-foreground">
-                      Classificações detalhadas, totalizando cerca de 673 atividades
+                      Classificações detalhadas, com milhares de atividades econômicas
                     </p>
                   </div>
                 </div>
