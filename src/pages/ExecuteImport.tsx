@@ -62,7 +62,7 @@ const ExecuteImport = () => {
             Importar Base de Empresas
           </CardTitle>
           <CardDescription>
-            Execute a importação de 100+ empresas cobrindo todos os 27 estados brasileiros
+            Execute a importação de 1000 empresas curadas cobrindo todos os 27 estados brasileiros
           </CardDescription>
         </CardHeader>
         
@@ -72,8 +72,8 @@ const ExecuteImport = () => {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Esta operação irá buscar e importar dados de 100+ empresas brasileiras.
-                  O processo pode levar alguns minutos.
+                  Esta operação irá buscar e importar dados de 1000 empresas brasileiras curadas.
+                  O processo pode levar entre 15-30 minutos para concluir.
                 </AlertDescription>
               </Alert>
               
