@@ -1,12 +1,13 @@
 import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
-import PageLayout from "@/components/PageLayout";
+import CNAEPageLayout from "@/components/CNAEPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import EmpresaCard from "@/components/EmpresaCard";
 import { useCNAESubclasses } from "@/hooks/useCNAEsData";
 import { useCNAEEmpresas } from "@/hooks/useCNAEEmpresas";
+import { useCNAEHierarchy } from "@/hooks/useCNAEHierarchy";
 import LoadingCard from "@/components/LoadingCard";
 import EmptyState from "@/components/EmptyState";
 import { Building2, ChevronLeft, ChevronRight } from "lucide-react";
@@ -19,18 +20,15 @@ const CNAESubclassePage = () => {
   const { data: todasSubclasses, isLoading: subclassesLoading } = useCNAESubclasses();
   const subclasse = todasSubclasses?.find(s => s.slug === slug);
   const { data: empresasData, isLoading: empresasLoading, error: empresasError } = useCNAEEmpresas(subclasse?.codigo || '', page, limit);
+  const { data: hierarchy } = useCNAEHierarchy(subclasse?.codigo || '');
 
   const totalPages = empresasData ? Math.ceil(empresasData.total / limit) : 0;
 
   if (subclassesLoading) {
     return (
-      <PageLayout
+      <CNAEPageLayout
         title="Carregando Subclasse CNAE..."
         description="Carregando informações da subclasse CNAE"
-        breadcrumbItems={[
-          { label: "CNAEs", href: "/cnae" },
-          { label: "Carregando..." }
-        ]}
       >
         <div className="grid gap-6">
           <LoadingCard />
@@ -40,19 +38,15 @@ const CNAESubclassePage = () => {
             ))}
           </div>
         </div>
-      </PageLayout>
+      </CNAEPageLayout>
     );
   }
 
   if (!subclasse) {
     return (
-      <PageLayout
+      <CNAEPageLayout
         title="Subclasse CNAE não encontrada"
         description="A subclasse CNAE solicitada não foi encontrada"
-        breadcrumbItems={[
-          { label: "CNAEs", href: "/cnae" },
-          { label: "Subclasse não encontrada" }
-        ]}
       >
         <EmptyState 
           title="Subclasse não encontrada"
@@ -60,7 +54,7 @@ const CNAESubclassePage = () => {
           actionLabel="Voltar para CNAEs"
           actionLink="/cnae"
         />
-      </PageLayout>
+      </CNAEPageLayout>
     );
   }
 
@@ -91,13 +85,13 @@ const CNAESubclassePage = () => {
   };
 
   return (
-    <PageLayout
+    <CNAEPageLayout
       title={`CNAE ${subclasse.codigo} - ${subclasse.nome}`}
       description={subclasse.descricao || `Empresas da subclasse CNAE ${subclasse.codigo} - ${subclasse.nome}`}
-      breadcrumbItems={[
-        { label: "CNAEs", href: "/cnae" },
-        { label: `CNAE ${subclasse.codigo}` }
-      ]}
+      hierarchy={hierarchy}
+      cnaeCode={subclasse.codigo}
+      cnaeType="subclasse"
+      totalEmpresas={empresasData?.total}
     >
       <div className="space-y-8">
         <div className="bg-muted/50 rounded-lg p-6">
@@ -199,7 +193,7 @@ const CNAESubclassePage = () => {
           </>
         )}
       </div>
-    </PageLayout>
+    </CNAEPageLayout>
   );
 };
 

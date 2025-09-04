@@ -1,8 +1,9 @@
 import { useParams, Link } from "react-router-dom";
-import PageLayout from "@/components/PageLayout";
+import CNAEPageLayout from "@/components/CNAEPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCNAEClasses, useCNAESubclasses } from "@/hooks/useCNAEsData";
+import { useCNAEHierarchy } from "@/hooks/useCNAEHierarchy";
 import LoadingCard from "@/components/LoadingCard";
 import EmptyState from "@/components/EmptyState";
 import { Building2 } from "lucide-react";
@@ -13,35 +14,28 @@ const CNAEClassePage = () => {
   const { data: todasClasses, isLoading: classesLoading } = useCNAEClasses();
   const classe = todasClasses?.find(c => c.slug === slug);
   const { data: subclasses, isLoading: subclassesLoading, error: subclassesError } = useCNAESubclasses(classe?.id);
+  const { data: hierarchy } = useCNAEHierarchy(classe?.codigo || '');
 
   if (classesLoading || subclassesLoading) {
     return (
-      <PageLayout
+      <CNAEPageLayout
         title="Carregando Classe CNAE..."
         description="Carregando informações da classe CNAE"
-        breadcrumbItems={[
-          { label: "CNAEs", href: "/cnae" },
-          { label: "Carregando..." }
-        ]}
       >
         <div className="grid gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <LoadingCard key={i} />
           ))}
         </div>
-      </PageLayout>
+      </CNAEPageLayout>
     );
   }
 
   if (!classe) {
     return (
-      <PageLayout
+      <CNAEPageLayout
         title="Classe CNAE não encontrada"
         description="A classe CNAE solicitada não foi encontrada"
-        breadcrumbItems={[
-          { label: "CNAEs", href: "/cnae" },
-          { label: "Classe não encontrada" }
-        ]}
       >
         <EmptyState 
           title="Classe não encontrada"
@@ -49,18 +43,18 @@ const CNAEClassePage = () => {
           actionLabel="Voltar para CNAEs"
           actionLink="/cnae"
         />
-      </PageLayout>
+      </CNAEPageLayout>
     );
   }
 
   return (
-    <PageLayout
+    <CNAEPageLayout
       title={`Classe ${classe.codigo} - ${classe.nome}`}
       description={classe.descricao || `Subclasses da classe ${classe.codigo} - ${classe.nome}`}
-      breadcrumbItems={[
-        { label: "CNAEs", href: "/cnae" },
-        { label: `Classe ${classe.codigo}` }
-      ]}
+      hierarchy={hierarchy}
+      cnaeCode={classe.codigo}
+      cnaeType="classe"
+      totalEmpresas={classe.total_empresas}
     >
       <div className="space-y-8">
         <div className="bg-muted/50 rounded-lg p-6">
@@ -137,7 +131,7 @@ const CNAEClassePage = () => {
           </div>
         )}
       </div>
-    </PageLayout>
+    </CNAEPageLayout>
   );
 };
 

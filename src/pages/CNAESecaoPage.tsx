@@ -1,8 +1,9 @@
 import { useParams, Link } from "react-router-dom";
-import PageLayout from "@/components/PageLayout";
+import CNAEPageLayout from "@/components/CNAEPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useCNAESecoes, useCNAEDivisoes } from "@/hooks/useCNAEsData";
+import { useCNAEHierarchy } from "@/hooks/useCNAEHierarchy";
 import LoadingCard from "@/components/LoadingCard";
 import EmptyState from "@/components/EmptyState";
 import { Building2 } from "lucide-react";
@@ -13,35 +14,28 @@ const CNAESecaoPage = () => {
   const { data: secoes, isLoading: secoesLoading } = useCNAESecoes();
   const secao = secoes?.find(s => s.slug === slug);
   const { data: divisoes, isLoading: divisoesLoading, error: divisoesError } = useCNAEDivisoes(secao?.id);
+  const { data: hierarchy } = useCNAEHierarchy(secao?.codigo || '');
 
   if (secoesLoading || divisoesLoading) {
     return (
-      <PageLayout
+      <CNAEPageLayout
         title="Carregando Seção CNAE..."
         description="Carregando informações da seção CNAE"
-        breadcrumbItems={[
-          { label: "CNAEs", href: "/cnae" },
-          { label: "Carregando..." }
-        ]}
       >
         <div className="grid gap-6">
           {Array.from({ length: 4 }).map((_, i) => (
             <LoadingCard key={i} />
           ))}
         </div>
-      </PageLayout>
+      </CNAEPageLayout>
     );
   }
 
   if (!secao) {
     return (
-      <PageLayout
+      <CNAEPageLayout
         title="Seção CNAE não encontrada"
         description="A seção CNAE solicitada não foi encontrada"
-        breadcrumbItems={[
-          { label: "CNAEs", href: "/cnae" },
-          { label: "Seção não encontrada" }
-        ]}
       >
         <EmptyState 
           title="Seção não encontrada"
@@ -49,18 +43,18 @@ const CNAESecaoPage = () => {
           actionLabel="Voltar para CNAEs"
           actionLink="/cnae"
         />
-      </PageLayout>
+      </CNAEPageLayout>
     );
   }
 
   return (
-    <PageLayout
+    <CNAEPageLayout
       title={`Seção ${secao.codigo} - ${secao.nome}`}
       description={secao.descricao || `Divisões da seção ${secao.codigo} - ${secao.nome}`}
-      breadcrumbItems={[
-        { label: "CNAEs", href: "/cnae" },
-        { label: `Seção ${secao.codigo}` }
-      ]}
+      hierarchy={hierarchy}
+      cnaeCode={secao.codigo}
+      cnaeType="secao"
+      totalEmpresas={secao.total_empresas}
     >
       <div className="space-y-8">
         <div className="bg-muted/50 rounded-lg p-6">
@@ -127,7 +121,7 @@ const CNAESecaoPage = () => {
           </div>
         )}
       </div>
-    </PageLayout>
+    </CNAEPageLayout>
   );
 };
 
