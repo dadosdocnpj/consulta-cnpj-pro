@@ -1,7 +1,8 @@
-import { Helmet } from "react-helmet-async";
+import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Building2, Clock } from "lucide-react";
-import PageLayout from "@/components/PageLayout";
+import { Building2, Clock, Filter } from "lucide-react";
+import ModernPageLayout from "@/components/ModernPageLayout";
+import SearchFilter from "@/components/SearchFilter";
 import EmpresaCard from "@/components/EmpresaCard";
 import LoadingCard from "@/components/LoadingCard";
 import EmptyState from "@/components/EmptyState";
@@ -9,7 +10,20 @@ import { Card } from "@/components/ui/card";
 import { useEmpresasRecentes } from "@/hooks/useEmpresasRecentes";
 
 const EmpresasRecentesPage = () => {
-  const { data: empresas, isLoading, error } = useEmpresasRecentes(30);
+  const { data: empresas, isLoading, error } = useEmpresasRecentes(50);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({});
+
+  const filteredEmpresas = useMemo(() => {
+    if (!empresas) return [];
+    return empresas.filter(empresa => {
+      const matchesSearch = !searchTerm || 
+        empresa.razao_social?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        empresa.nome_fantasia?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        empresa.cnpj.includes(searchTerm);
+      return matchesSearch;
+    });
+  }, [empresas, searchTerm]);
 
   const breadcrumbItems = [
     { label: "Início", href: "/" },
@@ -17,33 +31,24 @@ const EmpresasRecentesPage = () => {
   ];
 
   return (
-    <PageLayout 
+    <ModernPageLayout 
       title="Empresas Recentes"
       description="Últimas empresas consultadas e adicionadas à nossa base de dados"
       breadcrumbItems={breadcrumbItems}
+      icon={<Clock className="h-8 w-8" />}
+      keywords="empresas recentes, últimas consultas, novos cnpj, empresas atualizadas"
+      gradient="secondary"
     >
-      <Helmet>
-        <title>Empresas Recentes | Dados do CNPJ</title>
-        <meta 
-          name="description" 
-          content="Confira as empresas mais recentemente consultadas em nossa plataforma. Informações atualizadas e detalhadas."
+      <div className="space-y-8">
+        {/* Busca */}
+        <SearchFilter
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          filters={filters}
+          onFilterChange={setFilters}
+          placeholder="Buscar empresas recentes..."
+          showFilters={false}
         />
-        <meta name="keywords" content="empresas recentes, últimas consultas, novos cnpj, empresas atualizadas" />
-      </Helmet>
-
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="inline-flex items-center justify-center w-12 h-12 bg-secondary/10 rounded-xl">
-            <Clock className="h-6 w-6 text-secondary" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Empresas Recentes</h1>
-            <p className="text-muted-foreground">
-              Últimas empresas consultadas e atualizadas
-            </p>
-          </div>
-        </div>
-      </div>
 
       {isLoading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -73,10 +78,10 @@ const EmpresasRecentesPage = () => {
         />
       )}
 
-      {!isLoading && !error && empresas && empresas.length > 0 && (
+      {!isLoading && !error && filteredEmpresas.length > 0 && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {empresas.map((empresa) => (
+            {filteredEmpresas.map((empresa) => (
               <EmpresaCard key={empresa.cnpj} empresa={empresa} />
             ))}
           </div>
@@ -104,7 +109,8 @@ const EmpresasRecentesPage = () => {
           </div>
         </>
       )}
-    </PageLayout>
+      </div>
+    </ModernPageLayout>
   );
 };
 
