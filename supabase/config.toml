@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.empresa-search]
 verify_jwt = false
+
+[functions.importar-cnaes]
+verify_jwt = false

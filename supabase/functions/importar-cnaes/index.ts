@@ -1,515 +1,407 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
-import { getDadosCompletosOfficiais, criarSlug } from './dados-completos.ts';
-
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
-if (!supabaseUrl || !supabaseServiceKey) {
-  throw new Error('❌ Variáveis de ambiente do Supabase não configuradas');
-}
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
-interface CNAESeção {
-  codigo: string;
-  nome: string;
-  descricao: string;
-  icone?: string;
-  slug: string;
-}
-
-interface CNAEDivisao {
-  codigo: string;
-  nome: string;
-  descricao: string;
-  slug: string;
-  secao_codigo: string;
-}
-
-interface CNAEGrupo {
-  codigo: string;
-  nome: string;
-  descricao: string;
-  slug: string;
-  divisao_codigo: string;
-}
-
-interface CNAEClasse {
-  codigo: string;
-  nome: string;
-  descricao: string;
-  slug: string;
-  grupo_codigo: string;
-}
-
-interface CNAESubclasse {
-  codigo: string;
-  nome: string;
-  descricao: string;
-  slug: string;
-  classe_codigo: string;
-}
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { corsHeaders } from '../_shared/cors.ts'
+import { getDadosCompletosOfficiais, criarSlug } from './dados-completos.ts'
 
 interface ResultadoImportacao {
-  importados: number;
-  erros: number;
-  total: number;
+  sucesso: boolean;
+  message: string;
   detalhes: {
-    secoes: { importados: number; erros: number };
-    divisoes: { importados: number; erros: number };
-    grupos: { importados: number; erros: number };
-    classes: { importados: number; erros: number };
-    subclasses: { importados: number; erros: number };
+    secoes: { total: number; importadas: number; erros: number };
+    divisoes: { total: number; importadas: number; erros: number };
+    grupos: { total: number; importadas: number; erros: number };
+    classes: { total: number; importadas: number; erros: number };
+    subclasses: { total: number; importadas: number; erros: number };
   };
+  erros: string[];
 }
 
-// Processamento em lotes para evitar timeouts
-const BATCH_SIZE = 50;
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+)
 
 async function processarEmLotes<T>(
   items: T[],
-  processarItem: (item: T) => Promise<{ sucesso: boolean; erro?: string }>,
-  nomeCategoria: string
-): Promise<{ importados: number; erros: number; detalhesErros: string[] }> {
-  let importados = 0;
-  let erros = 0;
-  const detalhesErros: string[] = [];
+  processarItem: (item: T) => Promise<void>,
+  tamanhoLote: number = 50,
+  nomeEntidade: string = 'item'
+): Promise<{ sucessos: number; erros: number; mensagensErro: string[] }> {
+  let sucessos = 0
+  let erros = 0
+  const mensagensErro: string[] = []
 
-  console.log(`📊 Processando ${items.length} ${nomeCategoria} em lotes de ${BATCH_SIZE}...`);
+  console.log(`Processando ${items.length} ${nomeEntidade}(s) em lotes de ${tamanhoLote}`)
 
-  for (let i = 0; i < items.length; i += BATCH_SIZE) {
-    const lote = items.slice(i, i + BATCH_SIZE);
-    console.log(`⚙️ Processando lote ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(items.length / BATCH_SIZE)} de ${nomeCategoria}...`);
+  for (let i = 0; i < items.length; i += tamanhoLote) {
+    const lote = items.slice(i, i + tamanhoLote)
+    console.log(`Processando lote ${Math.floor(i / tamanhoLote) + 1}/${Math.ceil(items.length / tamanhoLote)} de ${nomeEntidade}`)
 
-    const promessas = lote.map(async (item) => {
+    for (const item of lote) {
       try {
-        const resultado = await processarItem(item);
-        if (resultado.sucesso) {
-          importados++;
-        } else {
-          erros++;
-          if (resultado.erro) {
-            detalhesErros.push(resultado.erro);
-          }
-        }
+        await processarItem(item)
+        sucessos++
       } catch (error) {
-        erros++;
-        const errorMsg = `❌ Erro ao processar item: ${error instanceof Error ? error.message : String(error)}`;
-        console.error(errorMsg);
-        detalhesErros.push(errorMsg);
+        erros++
+        const mensagem = `Erro ao processar ${nomeEntidade}: ${error.message}`
+        mensagensErro.push(mensagem)
+        console.error(mensagem)
       }
-    });
+    }
 
-    await Promise.all(promessas);
-    
     // Pequena pausa entre lotes para evitar sobrecarga
-    if (i + BATCH_SIZE < items.length) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+    if (i + tamanhoLote < items.length) {
+      await new Promise(resolve => setTimeout(resolve, 100))
     }
   }
 
-  console.log(`✅ ${nomeCategoria}: ${importados} importados, ${erros} erros`);
-  return { importados, erros, detalhesErros };
+  return { sucessos, erros, mensagensErro }
 }
 
 async function verificarExistenciaTabela(nomeTabela: string): Promise<boolean> {
-  try {
-    const { data, error } = await supabase
-      .from(nomeTabela)
-      .select('id')
-      .limit(1);
-    
-    return !error;
-  } catch {
-    return false;
+  const { data, error } = await supabase
+    .from('information_schema.tables')
+    .select('table_name')
+    .eq('table_schema', 'public')
+    .eq('table_name', nomeTabela)
+    .limit(1)
+
+  if (error) {
+    console.error(`Erro ao verificar tabela ${nomeTabela}:`, error)
+    return false
   }
+
+  return data && data.length > 0
 }
 
 async function validarEstruturaBanco(): Promise<boolean> {
-  const tabelas = ['cnaes_secoes', 'cnaes_divisoes', 'cnaes_grupos', 'cnaes_classes', 'cnaes_subclasses'];
-  
-  for (const tabela of tabelas) {
-    const existe = await verificarExistenciaTabela(tabela);
+  const tabelasNecessarias = [
+    'cnaes_secoes',
+    'cnaes_divisoes', 
+    'cnaes_grupos',
+    'cnaes_classes',
+    'cnaes_subclasses'
+  ]
+
+  console.log('Validando estrutura do banco de dados...')
+
+  for (const tabela of tabelasNecessarias) {
+    const existe = await verificarExistenciaTabela(tabela)
     if (!existe) {
-      console.error(`❌ Tabela ${tabela} não encontrada no banco de dados`);
-      return false;
+      console.error(`Tabela ${tabela} não encontrada`)
+      return false
     }
+    console.log(`✓ Tabela ${tabela} encontrada`)
   }
-  
-  console.log('✅ Estrutura do banco validada com sucesso');
-  return true;
+
+  return true
 }
 
-async function importarSecoes(secoes: CNAESeção[]): Promise<{ importados: number; erros: number; detalhesErros: string[] }> {
+async function importarSecoes(secoes: any[]): Promise<{ sucessos: number; erros: number; mensagensErro: string[] }> {
   return await processarEmLotes(
     secoes,
     async (secao) => {
-      try {
-        // Verificar se código é válido (apenas letras A-U)
-        if (!/^[A-U]$/.test(secao.codigo)) {
-          return { sucesso: false, erro: `❌ Código de seção inválido: ${secao.codigo}` };
-        }
+      const { error } = await supabase
+        .from('cnaes_secoes')
+        .upsert({
+          codigo: secao.codigo,
+          nome: secao.nome,
+          descricao: secao.descricao || null,
+          slug: criarSlug(secao.nome),
+          icone: secao.icone || null
+        }, {
+          onConflict: 'codigo'
+        })
 
-        const { error } = await supabase
-          .from('cnaes_secoes')
-          .upsert({
-            codigo: secao.codigo,
-            nome: secao.nome,
-            descricao: secao.descricao,
-            icone: secao.icone,
-            slug: secao.slug || criarSlug(secao.nome),
-            total_empresas: 0
-          }, {
-            onConflict: 'codigo'
-          });
-
-        if (error) {
-          return { sucesso: false, erro: `❌ Erro ao importar seção ${secao.codigo}: ${error.message}` };
-        }
-
-        return { sucesso: true };
-      } catch (error) {
-        return { sucesso: false, erro: `❌ Exceção ao importar seção ${secao.codigo}: ${error instanceof Error ? error.message : String(error)}` };
+      if (error) {
+        throw new Error(`Erro ao inserir seção ${secao.codigo}: ${error.message}`)
       }
     },
+    25,
     'seções'
-  );
+  )
 }
 
-async function importarDivisoes(divisoes: CNAEDivisao[]): Promise<{ importados: number; erros: number; detalhesErros: string[] }> {
+async function importarDivisoes(divisoes: any[]): Promise<{ sucessos: number; erros: number; mensagensErro: string[] }> {
   return await processarEmLotes(
     divisoes,
     async (divisao) => {
-      try {
-        // Verificar se seção existe
-        const { data: secaoExiste } = await supabase
-          .from('cnaes_secoes')
-          .select('id')
-          .eq('codigo', divisao.secao_codigo)
-          .single();
+      // Buscar seção pai
+      const { data: secao, error: secaoError } = await supabase
+        .from('cnaes_secoes')
+        .select('id')
+        .eq('codigo', divisao.secao_codigo)
+        .single()
 
-        if (!secaoExiste) {
-          return { sucesso: false, erro: `❌ Seção ${divisao.secao_codigo} não encontrada para divisão ${divisao.codigo}` };
-        }
+      if (secaoError || !secao) {
+        throw new Error(`Seção pai ${divisao.secao_codigo} não encontrada para divisão ${divisao.codigo}`)
+      }
 
-        const { error } = await supabase
-          .from('cnaes_divisoes')
-          .upsert({
-            codigo: divisao.codigo,
-            nome: divisao.nome,
-            descricao: divisao.descricao,
-            slug: divisao.slug || criarSlug(divisao.nome),
-            secao_id: secaoExiste.id,
-            total_empresas: 0
-          }, {
-            onConflict: 'codigo'
-          });
+      const { error } = await supabase
+        .from('cnaes_divisoes')
+        .upsert({
+          codigo: divisao.codigo,
+          nome: divisao.nome,
+          descricao: divisao.descricao || null,
+          slug: criarSlug(divisao.nome),
+          secao_id: secao.id
+        }, {
+          onConflict: 'codigo'
+        })
 
-        if (error) {
-          return { sucesso: false, erro: `❌ Erro ao importar divisão ${divisao.codigo}: ${error.message}` };
-        }
-
-        return { sucesso: true };
-      } catch (error) {
-        return { sucesso: false, erro: `❌ Exceção ao importar divisão ${divisao.codigo}: ${error instanceof Error ? error.message : String(error)}` };
+      if (error) {
+        throw new Error(`Erro ao inserir divisão ${divisao.codigo}: ${error.message}`)
       }
     },
+    25,
     'divisões'
-  );
+  )
 }
 
-async function importarGrupos(grupos: CNAEGrupo[]): Promise<{ importados: number; erros: number; detalhesErros: string[] }> {
+async function importarGrupos(grupos: any[]): Promise<{ sucessos: number; erros: number; mensagensErro: string[] }> {
   return await processarEmLotes(
     grupos,
     async (grupo) => {
-      try {
-        // Verificar se divisão existe
-        const { data: divisaoExiste } = await supabase
-          .from('cnaes_divisoes')
-          .select('id')
-          .eq('codigo', grupo.divisao_codigo)
-          .single();
+      // Buscar divisão pai
+      const { data: divisao, error: divisaoError } = await supabase
+        .from('cnaes_divisoes')
+        .select('id')
+        .eq('codigo', grupo.divisao_codigo)
+        .single()
 
-        if (!divisaoExiste) {
-          return { sucesso: false, erro: `❌ Divisão ${grupo.divisao_codigo} não encontrada para grupo ${grupo.codigo}` };
-        }
+      if (divisaoError || !divisao) {
+        throw new Error(`Divisão pai ${grupo.divisao_codigo} não encontrada para grupo ${grupo.codigo}`)
+      }
 
-        const { error } = await supabase
-          .from('cnaes_grupos')
-          .upsert({
-            codigo: grupo.codigo,
-            nome: grupo.nome,
-            descricao: grupo.descricao,
-            slug: grupo.slug || criarSlug(grupo.nome),
-            divisao_id: divisaoExiste.id,
-            total_empresas: 0
-          }, {
-            onConflict: 'codigo'
-          });
+      const { error } = await supabase
+        .from('cnaes_grupos')
+        .upsert({
+          codigo: grupo.codigo,
+          nome: grupo.nome,
+          descricao: grupo.descricao || null,
+          slug: criarSlug(grupo.nome),
+          divisao_id: divisao.id
+        }, {
+          onConflict: 'codigo'
+        })
 
-        if (error) {
-          return { sucesso: false, erro: `❌ Erro ao importar grupo ${grupo.codigo}: ${error.message}` };
-        }
-
-        return { sucesso: true };
-      } catch (error) {
-        return { sucesso: false, erro: `❌ Exceção ao importar grupo ${grupo.codigo}: ${error instanceof Error ? error.message : String(error)}` };
+      if (error) {
+        throw new Error(`Erro ao inserir grupo ${grupo.codigo}: ${error.message}`)
       }
     },
+    25,
     'grupos'
-  );
+  )
 }
 
-async function importarClasses(classes: CNAEClasse[]): Promise<{ importados: number; erros: number; detalhesErros: string[] }> {
+async function importarClasses(classes: any[]): Promise<{ sucessos: number; erros: number; mensagensErro: string[] }> {
   return await processarEmLotes(
     classes,
     async (classe) => {
-      try {
-        // Verificar se grupo existe
-        const { data: grupoExiste } = await supabase
-          .from('cnaes_grupos')
-          .select('id')
-          .eq('codigo', classe.grupo_codigo)
-          .single();
+      // Buscar grupo pai
+      const { data: grupo, error: grupoError } = await supabase
+        .from('cnaes_grupos')
+        .select('id')
+        .eq('codigo', classe.grupo_codigo)
+        .single()
 
-        if (!grupoExiste) {
-          return { sucesso: false, erro: `❌ Grupo ${classe.grupo_codigo} não encontrado para classe ${classe.codigo}` };
-        }
+      if (grupoError || !grupo) {
+        throw new Error(`Grupo pai ${classe.grupo_codigo} não encontrado para classe ${classe.codigo}`)
+      }
 
-        const { error } = await supabase
-          .from('cnaes_classes')
-          .upsert({
-            codigo: classe.codigo,
-            nome: classe.nome,
-            descricao: classe.descricao,
-            slug: classe.slug || criarSlug(classe.nome),
-            grupo_id: grupoExiste.id,
-            total_empresas: 0
-          }, {
-            onConflict: 'codigo'
-          });
+      const { error } = await supabase
+        .from('cnaes_classes')
+        .upsert({
+          codigo: classe.codigo,
+          nome: classe.nome,
+          descricao: classe.descricao || null,
+          slug: criarSlug(classe.nome),
+          grupo_id: grupo.id
+        }, {
+          onConflict: 'codigo'
+        })
 
-        if (error) {
-          return { sucesso: false, erro: `❌ Erro ao importar classe ${classe.codigo}: ${error.message}` };
-        }
-
-        return { sucesso: true };
-      } catch (error) {
-        return { sucesso: false, erro: `❌ Exceção ao importar classe ${classe.codigo}: ${error instanceof Error ? error.message : String(error)}` };
+      if (error) {
+        throw new Error(`Erro ao inserir classe ${classe.codigo}: ${error.message}`)
       }
     },
+    25,
     'classes'
-  );
+  )
 }
 
-async function importarSubclasses(subclasses: CNAESubclasse[]): Promise<{ importados: number; erros: number; detalhesErros: string[] }> {
+async function importarSubclasses(subclasses: any[]): Promise<{ sucessos: number; erros: number; mensagensErro: string[] }> {
   return await processarEmLotes(
     subclasses,
     async (subclasse) => {
-      try {
-        // Verificar se classe existe
-        const { data: classeExiste } = await supabase
-          .from('cnaes_classes')
-          .select('id')
-          .eq('codigo', subclasse.classe_codigo)
-          .single();
+      // Buscar classe pai
+      const { data: classe, error: classeError } = await supabase
+        .from('cnaes_classes')
+        .select('id')
+        .eq('codigo', subclasse.classe_codigo)
+        .single()
 
-        if (!classeExiste) {
-          return { sucesso: false, erro: `❌ Classe ${subclasse.classe_codigo} não encontrada para subclasse ${subclasse.codigo}` };
-        }
+      if (classeError || !classe) {
+        throw new Error(`Classe pai ${subclasse.classe_codigo} não encontrada para subclasse ${subclasse.codigo}`)
+      }
 
-        const { error } = await supabase
-          .from('cnaes_subclasses')
-          .upsert({
-            codigo: subclasse.codigo,
-            nome: subclasse.nome,
-            descricao: subclasse.descricao,
-            slug: subclasse.slug || criarSlug(subclasse.nome),
-            classe_id: classeExiste.id,
-            is_principal: (subclasse as any).is_principal || false,
-            total_empresas: 0
-          }, {
-            onConflict: 'codigo'
-          });
+      const { error } = await supabase
+        .from('cnaes_subclasses')
+        .upsert({
+          codigo: subclasse.codigo,
+          nome: subclasse.nome,
+          descricao: subclasse.descricao || null,
+          slug: criarSlug(subclasse.nome),
+          classe_id: classe.id,
+          is_principal: subclasse.is_principal || false
+        }, {
+          onConflict: 'codigo'
+        })
 
-        if (error) {
-          return { sucesso: false, erro: `❌ Erro ao importar subclasse ${subclasse.codigo}: ${error.message}` };
-        }
-
-        return { sucesso: true };
-      } catch (error) {
-        return { sucesso: false, erro: `❌ Exceção ao importar subclasse ${subclasse.codigo}: ${error instanceof Error ? error.message : String(error)}` };
+      if (error) {
+        throw new Error(`Erro ao inserir subclasse ${subclasse.codigo}: ${error.message}`)
       }
     },
+    25,
     'subclasses'
-  );
+  )
 }
 
 async function importarCNAEs(): Promise<ResultadoImportacao> {
-  console.log('🚀 Iniciando importação completa dos CNAEs...');
+  console.log('=== INÍCIO DA IMPORTAÇÃO DE CNAEs ===')
   
-  const inicioImportacao = Date.now();
+  const resultado: ResultadoImportacao = {
+    sucesso: false,
+    message: '',
+    detalhes: {
+      secoes: { total: 0, importadas: 0, erros: 0 },
+      divisoes: { total: 0, importadas: 0, erros: 0 },
+      grupos: { total: 0, importadas: 0, erros: 0 },
+      classes: { total: 0, importadas: 0, erros: 0 },
+      subclasses: { total: 0, importadas: 0, erros: 0 }
+    },
+    erros: []
+  }
 
   try {
-    // 1. Validar estrutura do banco
-    const estruturaValida = await validarEstruturaBanco();
+    // Validar estrutura do banco
+    const estruturaValida = await validarEstruturaBanco()
     if (!estruturaValida) {
-      throw new Error('❌ Estrutura do banco de dados inválida');
+      resultado.message = 'Estrutura do banco de dados inválida'
+      resultado.erros.push('Uma ou mais tabelas necessárias não foram encontradas')
+      return resultado
     }
 
-    // 2. Obter dados completos oficiais
-    console.log('📥 Carregando dados CNAEs oficiais completos...');
-    const dadosCompletos = getDadosCompletosOfficiais();
-    const { secoes, divisoes, grupos, classes, subclasses } = dadosCompletos;
+    console.log('Obtendo dados oficiais dos CNAEs...')
+    const dadosCompletos = getDadosCompletosOfficiais()
 
-    console.log(`📊 Dados carregados:
-    - ${secoes.length} seções
-    - ${divisoes.length} divisões  
-    - ${grupos.length} grupos
-    - ${classes.length} classes
-    - ${subclasses.length} subclasses`);
+    // Importar seções
+    console.log('\n=== IMPORTANDO SEÇÕES ===')
+    resultado.detalhes.secoes.total = dadosCompletos.secoes.length
+    const resultadoSecoes = await importarSecoes(dadosCompletos.secoes)
+    resultado.detalhes.secoes.importadas = resultadoSecoes.sucessos
+    resultado.detalhes.secoes.erros = resultadoSecoes.erros
+    resultado.erros.push(...resultadoSecoes.mensagensErro)
 
-    // 3. Importar em ordem hierárquica
-    console.log('🔄 Iniciando importação hierárquica...');
+    // Importar divisões
+    console.log('\n=== IMPORTANDO DIVISÕES ===')
+    resultado.detalhes.divisoes.total = dadosCompletos.divisoes.length
+    const resultadoDivisoes = await importarDivisoes(dadosCompletos.divisoes)
+    resultado.detalhes.divisoes.importadas = resultadoDivisoes.sucessos
+    resultado.detalhes.divisoes.erros = resultadoDivisoes.erros
+    resultado.erros.push(...resultadoDivisoes.mensagensErro)
 
-    const resultadoSecoes = await importarSecoes(secoes);
-    const resultadoDivisoes = await importarDivisoes(divisoes);
-    const resultadoGrupos = await importarGrupos(grupos);
-    const resultadoClasses = await importarClasses(classes);
-    const resultadoSubclasses = await importarSubclasses(subclasses);
+    // Importar grupos
+    console.log('\n=== IMPORTANDO GRUPOS ===')
+    resultado.detalhes.grupos.total = dadosCompletos.grupos.length
+    const resultadoGrupos = await importarGrupos(dadosCompletos.grupos)
+    resultado.detalhes.grupos.importadas = resultadoGrupos.sucessos
+    resultado.detalhes.grupos.erros = resultadoGrupos.erros
+    resultado.erros.push(...resultadoGrupos.mensagensErro)
 
-    // 4. Compilar resultados
-    const totalImportados = 
-      resultadoSecoes.importados + 
-      resultadoDivisoes.importados + 
-      resultadoGrupos.importados + 
-      resultadoClasses.importados + 
-      resultadoSubclasses.importados;
+    // Importar classes
+    console.log('\n=== IMPORTANDO CLASSES ===')
+    resultado.detalhes.classes.total = dadosCompletos.classes.length
+    const resultadoClasses = await importarClasses(dadosCompletos.classes)
+    resultado.detalhes.classes.importadas = resultadoClasses.sucessos
+    resultado.detalhes.classes.erros = resultadoClasses.erros
+    resultado.erros.push(...resultadoClasses.mensagensErro)
 
-    const totalErros = 
-      resultadoSecoes.erros + 
-      resultadoDivisoes.erros + 
-      resultadoGrupos.erros + 
-      resultadoClasses.erros + 
-      resultadoSubclasses.erros;
+    // Importar subclasses
+    console.log('\n=== IMPORTANDO SUBCLASSES ===')
+    resultado.detalhes.subclasses.total = dadosCompletos.subclasses.length
+    const resultadoSubclasses = await importarSubclasses(dadosCompletos.subclasses)
+    resultado.detalhes.subclasses.importadas = resultadoSubclasses.sucessos
+    resultado.detalhes.subclasses.erros = resultadoSubclasses.erros
+    resultado.erros.push(...resultadoSubclasses.mensagensErro)
 
-    const totalProcessados = 
-      secoes.length + 
-      divisoes.length + 
-      grupos.length + 
-      classes.length + 
-      subclasses.length;
+    // Verificar sucesso geral
+    const totalErros = resultado.detalhes.secoes.erros + 
+                      resultado.detalhes.divisoes.erros + 
+                      resultado.detalhes.grupos.erros + 
+                      resultado.detalhes.classes.erros + 
+                      resultado.detalhes.subclasses.erros
 
-    const duracaoMs = Date.now() - inicioImportacao;
-    const duracao = Math.round(duracaoMs / 1000);
-
-    console.log(`🎉 Importação concluída em ${duracao}s:
-    ✅ Total importados: ${totalImportados}
-    ❌ Total erros: ${totalErros}
-    📊 Total processados: ${totalProcessados}
-    
-    📋 Detalhes por categoria:
-    - Seções: ${resultadoSecoes.importados}/${secoes.length} (${resultadoSecoes.erros} erros)
-    - Divisões: ${resultadoDivisoes.importados}/${divisoes.length} (${resultadoDivisoes.erros} erros)
-    - Grupos: ${resultadoGrupos.importados}/${grupos.length} (${resultadoGrupos.erros} erros)
-    - Classes: ${resultadoClasses.importados}/${classes.length} (${resultadoClasses.erros} erros)
-    - Subclasses: ${resultadoSubclasses.importados}/${subclasses.length} (${resultadoSubclasses.erros} erros)`);
-
-    // Log dos primeiros erros se houver
-    const todosErros = [
-      ...resultadoSecoes.detalhesErros,
-      ...resultadoDivisoes.detalhesErros,
-      ...resultadoGrupos.detalhesErros,
-      ...resultadoClasses.detalhesErros,
-      ...resultadoSubclasses.detalhesErros
-    ];
-
-    if (todosErros.length > 0) {
-      console.log('⚠️ Primeiros erros encontrados:');
-      todosErros.slice(0, 10).forEach(erro => console.error(erro));
-      if (todosErros.length > 10) {
-        console.log(`... e mais ${todosErros.length - 10} erros`);
-      }
+    if (totalErros === 0) {
+      resultado.sucesso = true
+      resultado.message = 'Importação de CNAEs concluída com sucesso!'
+    } else {
+      resultado.sucesso = false
+      resultado.message = `Importação concluída com ${totalErros} erro(s)`
     }
 
-    return {
-      importados: totalImportados,
-      erros: totalErros,
-      total: totalProcessados,
-      detalhes: {
-        secoes: { importados: resultadoSecoes.importados, erros: resultadoSecoes.erros },
-        divisoes: { importados: resultadoDivisoes.importados, erros: resultadoDivisoes.erros },
-        grupos: { importados: resultadoGrupos.importados, erros: resultadoGrupos.erros },
-        classes: { importados: resultadoClasses.importados, erros: resultadoClasses.erros },
-        subclasses: { importados: resultadoSubclasses.importados, erros: resultadoSubclasses.erros }
-      }
-    };
+    console.log('\n=== RESULTADO FINAL ===')
+    console.log(`Seções: ${resultado.detalhes.secoes.importadas}/${resultado.detalhes.secoes.total}`)
+    console.log(`Divisões: ${resultado.detalhes.divisoes.importadas}/${resultado.detalhes.divisoes.total}`)
+    console.log(`Grupos: ${resultado.detalhes.grupos.importadas}/${resultado.detalhes.grupos.total}`)
+    console.log(`Classes: ${resultado.detalhes.classes.importadas}/${resultado.detalhes.classes.total}`)
+    console.log(`Subclasses: ${resultado.detalhes.subclasses.importadas}/${resultado.detalhes.subclasses.total}`)
+    console.log(`Total de erros: ${totalErros}`)
+
+    return resultado
 
   } catch (error) {
-    const mensagemErro = `❌ Erro fatal na importação: ${error instanceof Error ? error.message : String(error)}`;
-    console.error(mensagemErro);
-    
-    return {
-      importados: 0,
-      erros: 1,
-      total: 0,
-      detalhes: {
-        secoes: { importados: 0, erros: 0 },
-        divisoes: { importados: 0, erros: 0 },
-        grupos: { importados: 0, erros: 0 },
-        classes: { importados: 0, erros: 0 },
-        subclasses: { importados: 0, erros: 1 }
-      }
-    };
+    console.error('Erro geral na importação:', error)
+    resultado.sucesso = false
+    resultado.message = `Erro durante a importação: ${error.message}`
+    resultado.erros.push(error.message)
+    return resultado
   }
 }
 
-// Handler da função serverless
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    console.log('🎯 Função de importação CNAEs chamada');
-    
-    const resultado = await importarCNAEs();
-    
-    // Adicionar campo sucesso baseado nos resultados
-    const resultadoComSucesso = {
-      ...resultado,
-      sucesso: resultado.erros === 0 || (resultado.importados > 0 && resultado.erros < resultado.total * 0.5)
-    };
-    
-    return new Response(
-      JSON.stringify(resultadoComSucesso),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+    console.log('Iniciando importação de CNAEs...')
+    const resultado = await importarCNAEs()
+
+    return new Response(JSON.stringify(resultado), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: resultado.sucesso ? 200 : 500
+    })
+
   } catch (error) {
-    const mensagemErro = `❌ Erro na função: ${error instanceof Error ? error.message : String(error)}`;
-    console.error(mensagemErro);
+    console.error('Erro na função importar-cnaes:', error)
     
-    return new Response(
-      JSON.stringify({ 
-        error: mensagemErro,
-        importados: 0,
-        erros: 1,
-        total: 0,
-        sucesso: false
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
-    );
+    const resultado: ResultadoImportacao = {
+      sucesso: false,
+      message: `Erro inesperado: ${error.message}`,
+      detalhes: {
+        secoes: { total: 0, importadas: 0, erros: 0 },
+        divisoes: { total: 0, importadas: 0, erros: 0 },
+        grupos: { total: 0, importadas: 0, erros: 0 },
+        classes: { total: 0, importadas: 0, erros: 0 },
+        subclasses: { total: 0, importadas: 0, erros: 0 }
+      },
+      erros: [error.message]
+    }
+
+    return new Response(JSON.stringify(resultado), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500
+    })
   }
-});
+})
