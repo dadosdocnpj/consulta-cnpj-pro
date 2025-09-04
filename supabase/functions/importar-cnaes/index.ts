@@ -57,44 +57,8 @@ async function processarEmLotes<T>(
   return { sucessos, erros, mensagensErro }
 }
 
-async function verificarExistenciaTabela(nomeTabela: string): Promise<boolean> {
-  const { data, error } = await supabase
-    .from('information_schema.tables')
-    .select('table_name')
-    .eq('table_schema', 'public')
-    .eq('table_name', nomeTabela)
-    .limit(1)
-
-  if (error) {
-    console.error(`Erro ao verificar tabela ${nomeTabela}:`, error)
-    return false
-  }
-
-  return data && data.length > 0
-}
-
-async function validarEstruturaBanco(): Promise<boolean> {
-  const tabelasNecessarias = [
-    'cnaes_secoes',
-    'cnaes_divisoes', 
-    'cnaes_grupos',
-    'cnaes_classes',
-    'cnaes_subclasses'
-  ]
-
-  console.log('Validando estrutura do banco de dados...')
-
-  for (const tabela of tabelasNecessarias) {
-    const existe = await verificarExistenciaTabela(tabela)
-    if (!existe) {
-      console.error(`Tabela ${tabela} não encontrada`)
-      return false
-    }
-    console.log(`✓ Tabela ${tabela} encontrada`)
-  }
-
-  return true
-}
+// Função de validação removida - as tabelas já existem no banco
+// Validação desnecessária que causava erro 500 ao tentar acessar information_schema
 
 async function importarSecoes(secoes: any[]): Promise<{ sucessos: number; erros: number; mensagensErro: string[] }> {
   return await processarEmLotes(
@@ -283,14 +247,6 @@ async function importarCNAEs(): Promise<ResultadoImportacao> {
   }
 
   try {
-    // Validar estrutura do banco
-    const estruturaValida = await validarEstruturaBanco()
-    if (!estruturaValida) {
-      resultado.message = 'Estrutura do banco de dados inválida'
-      resultado.erros.push('Uma ou mais tabelas necessárias não foram encontradas')
-      return resultado
-    }
-
     console.log('Obtendo dados oficiais dos CNAEs...')
     const dadosCompletos = getDadosCompletosOfficiais()
 
