@@ -138,3 +138,149 @@ export const getCNPJErrorMessage = (cnpj: string): string => {
   
   return 'CNPJ não encontrado';
 };
+
+/**
+ * Formata CEP com máscara
+ */
+export const formatCEP = (cep: string): string => {
+  const cleaned = cep.replace(/\D/g, '');
+  
+  if (cleaned.length !== 8) {
+    return cep;
+  }
+  
+  return cleaned.replace(/^(\d{5})(\d{3})$/, '$1-$2');
+};
+
+/**
+ * Formata telefone brasileiro
+ */
+export const formatTelefone = (telefone: string): string => {
+  if (!telefone) return '';
+  
+  const cleaned = telefone.replace(/\D/g, '');
+  
+  if (cleaned.length === 10) {
+    return cleaned.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+  }
+  
+  if (cleaned.length === 11) {
+    return cleaned.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+  }
+  
+  return telefone;
+};
+
+/**
+ * Formata capital social em moeda brasileira
+ */
+export const formatCapitalSocial = (capital: string): string => {
+  if (!capital) return '';
+  
+  const numero = parseFloat(capital);
+  
+  if (isNaN(numero)) return capital;
+  
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(numero);
+};
+
+/**
+ * Calcula idade da empresa em anos
+ */
+export const calcularIdadeEmpresa = (dataAbertura: string): string => {
+  if (!dataAbertura) return '';
+  
+  const abertura = new Date(dataAbertura);
+  const hoje = new Date();
+  
+  if (isNaN(abertura.getTime())) return '';
+  
+  const diffTime = hoje.getTime() - abertura.getTime();
+  const diffYears = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365.25));
+  
+  if (diffYears < 1) {
+    const diffMonths = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 30.44));
+    return diffMonths <= 1 ? '1 mês' : `${diffMonths} meses`;
+  }
+  
+  return diffYears === 1 ? '1 ano' : `${diffYears} anos`;
+};
+
+/**
+ * Formata data para padrão brasileiro
+ */
+export const formatDateBR = (date: string): string => {
+  if (!date) return '';
+  
+  const dateObj = new Date(date);
+  
+  if (isNaN(dateObj.getTime())) return date;
+  
+  return dateObj.toLocaleDateString('pt-BR');
+};
+
+/**
+ * Gera endereço completo formatado
+ */
+export const formatEnderecoCompleto = (endereco: any): string => {
+  if (!endereco) return '';
+  
+  const partes = [];
+  
+  if (endereco.tipo_logradouro && endereco.logradouro) {
+    partes.push(`${endereco.tipo_logradouro} ${endereco.logradouro}`);
+  } else if (endereco.logradouro) {
+    partes.push(endereco.logradouro);
+  }
+  
+  if (endereco.numero) {
+    partes.push(endereco.numero);
+  }
+  
+  if (endereco.complemento) {
+    partes.push(endereco.complemento);
+  }
+  
+  if (endereco.bairro) {
+    partes.push(endereco.bairro);
+  }
+  
+  if (endereco.municipio && endereco.uf) {
+    partes.push(`${endereco.municipio}/${endereco.uf}`);
+  }
+  
+  if (endereco.cep) {
+    partes.push(`CEP: ${formatCEP(endereco.cep)}`);
+  }
+  
+  return partes.join(', ');
+};
+
+/**
+ * Interpreta o porte da empresa
+ */
+export const interpretarPorte = (porte: string): string => {
+  const portes: Record<string, string> = {
+    'MICRO EMPRESA': 'Microempresa',
+    'PEQUENO PORTE': 'Empresa de Pequeno Porte',
+    'DEMAIS': 'Empresa de Médio/Grande Porte'
+  };
+  
+  return portes[porte] || porte;
+};
+
+/**
+ * Gera URL do Google Maps para o endereço
+ */
+export const gerarURLMaps = (endereco: any): string => {
+  if (!endereco) return '';
+  
+  const enderecoCompleto = formatEnderecoCompleto(endereco);
+  
+  if (!enderecoCompleto) return '';
+  
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoCompleto)}`;
+};

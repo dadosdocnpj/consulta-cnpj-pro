@@ -19,8 +19,23 @@ import {
   ExternalLink,
   CheckCircle,
   AlertCircle,
-  XCircle
+  XCircle,
+  Clock,
+  Map,
+  Award,
+  QrCode
 } from 'lucide-react';
+import { 
+  formatCNPJ, 
+  formatCEP, 
+  formatTelefone, 
+  formatCapitalSocial, 
+  calcularIdadeEmpresa, 
+  formatDateBR, 
+  formatEnderecoCompleto, 
+  interpretarPorte, 
+  gerarURLMaps 
+} from '@/utils/cnpj';
 import { toast } from 'sonner';
 import PageLayout from '@/components/PageLayout';
 
@@ -261,15 +276,22 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
               </div>
 
               {/* Status */}
-              <div className="flex items-center gap-3">
-                <Badge className={`${getSituacaoColor(data.situacao_cadastral)} flex items-center gap-2 px-3 py-2`}>
-                  <SituacaoIcon className="h-4 w-4" />
-                  {data.situacao_cadastral || 'Status não informado'}
-                </Badge>
-                {data.data_situacao_cadastral && (
-                  <span className="text-sm text-muted-foreground">
-                    desde {new Date(data.data_situacao_cadastral).toLocaleDateString('pt-BR')}
-                  </span>
+              <div className="space-y-2">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <Badge className={`${getSituacaoColor(data.situacao_cadastral)} flex items-center gap-2 px-3 py-2`}>
+                    <SituacaoIcon className="h-4 w-4" />
+                    {data.situacao_cadastral || 'Status não informado'}
+                  </Badge>
+                  {data.data_situacao_cadastral && (
+                    <span className="text-sm text-muted-foreground">
+                      desde {formatDateBR(data.data_situacao_cadastral)}
+                    </span>
+                  )}
+                </div>
+                {data.motivo_situacao_cadastral && (
+                  <p className="text-sm text-muted-foreground">
+                    Motivo: {data.motivo_situacao_cadastral}
+                  </p>
                 )}
               </div>
             </CardContent>
@@ -291,7 +313,7 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
                     <Calendar className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground">Data de Abertura</p>
-                      <p className="font-medium">{new Date(data.data_abertura).toLocaleDateString('pt-BR')}</p>
+                      <p className="font-medium">{formatDateBR(data.data_abertura)}</p>
                     </div>
                   </div>
                 )}
@@ -311,7 +333,7 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
                     <DollarSign className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground">Capital Social</p>
-                      <p className="font-medium">R$ {data.capital_social}</p>
+                      <p className="font-medium">{formatCapitalSocial(data.capital_social)}</p>
                     </div>
                   </div>
                 )}
@@ -322,6 +344,36 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
                     <div>
                       <p className="text-sm text-muted-foreground">Regime Tributário</p>
                       <p className="font-medium">{data.regime_tributario}</p>
+                    </div>
+                  </div>
+                )}
+
+                {data.porte && (
+                  <div className="flex items-center gap-3">
+                    <Award className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Porte da Empresa</p>
+                      <p className="font-medium">{interpretarPorte(data.porte)}</p>
+                    </div>
+                  </div>
+                )}
+
+                {data.data_abertura && (
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Tempo de Atividade</p>
+                      <p className="font-medium">{calcularIdadeEmpresa(data.data_abertura)}</p>
+                    </div>
+                  </div>
+                )}
+
+                {data.tipo && (
+                  <div className="flex items-center gap-3">
+                    <Building2 className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Tipo</p>
+                      <p className="font-medium">{data.tipo}</p>
                     </div>
                   </div>
                 )}
@@ -340,10 +392,13 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
                 {data.endereco && (
                   <div className="flex items-start gap-3">
                     <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-                    <div>
+                    <div className="flex-1">
                       <p className="text-sm text-muted-foreground">Endereço</p>
-                      <div className="font-medium">
-                        <p>{data.endereco.logradouro}, {data.endereco.numero}</p>
+                      <div className="font-medium space-y-1">
+                        <p>
+                          {data.endereco.tipo_logradouro && `${data.endereco.tipo_logradouro} `}
+                          {data.endereco.logradouro}, {data.endereco.numero}
+                        </p>
                         {data.endereco.complemento && <p>{data.endereco.complemento}</p>}
                         <p>{data.endereco.bairro}</p>
                         <p>
@@ -353,8 +408,24 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
                           >
                             {data.endereco.municipio}
                           </Link>
-                          , {data.endereco.uf} - CEP: {data.endereco.cep}
+                          , <Link 
+                            to={`/estados/${data.endereco.uf.toLowerCase()}`}
+                            className="text-primary hover:underline"
+                          >
+                            {data.endereco.uf}
+                          </Link> - CEP: {formatCEP(data.endereco.cep)}
                         </p>
+                      </div>
+                      <div className="mt-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => window.open(gerarURLMaps(data.endereco), '_blank')}
+                          className="text-xs"
+                        >
+                          <Map className="mr-1 h-3 w-3" />
+                          Ver no Mapa
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -364,8 +435,18 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
                   <div className="flex items-center gap-3">
                     <Phone className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Telefone</p>
-                      <p className="font-medium">{data.telefone}</p>
+                      <p className="text-sm text-muted-foreground">Telefone Principal</p>
+                      <p className="font-medium">{formatTelefone(data.telefone)}</p>
+                    </div>
+                  </div>
+                )}
+
+                {data.telefone2 && (
+                  <div className="flex items-center gap-3">
+                    <Phone className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Telefone Secundário</p>
+                      <p className="font-medium">{formatTelefone(data.telefone2)}</p>
                     </div>
                   </div>
                 )}

@@ -201,7 +201,10 @@ serve(async (req) => {
       nome_fantasia: data.nome_fantasia,
       situacao_cadastral: data.situacao.nome,
       data_situacao_cadastral: data.situacao.data,
+      motivo_situacao_cadastral: data.situacao.motivo,
       natureza_juridica: data.natureza_juridica,
+      porte: data.porte,
+      tipo: data.tipo,
       cnae_principal: {
         codigo: data.atividade_principal.codigo,
         descricao: data.atividade_principal.descricao
@@ -211,6 +214,7 @@ serve(async (req) => {
         descricao: atividade.descricao
       })),
       endereco: {
+        tipo_logradouro: data.endereco.tipo_logradouro,
         logradouro: data.endereco.logradouro,
         numero: data.endereco.numero,
         complemento: data.endereco.complemento,
@@ -220,9 +224,11 @@ serve(async (req) => {
         cep: data.endereco.cep
       },
       telefone: data.telefone1,
+      telefone2: data.telefone2,
       email: data.email,
       data_abertura: data.data_inicio,
-      capital_social: data.capital_social
+      capital_social: data.capital_social,
+      regime_tributario: data.regime_tributario
     };
 
     // Gerar slug para URL amigável

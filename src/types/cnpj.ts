@@ -5,7 +5,10 @@ export interface CNPJData {
   nome_fantasia?: string;
   situacao_cadastral?: string;
   data_situacao_cadastral?: string;
+  motivo_situacao_cadastral?: string;
   natureza_juridica?: string;
+  porte?: string;
+  tipo?: string;
   cnae_principal?: {
     codigo: string;
     descricao: string;
@@ -15,6 +18,7 @@ export interface CNPJData {
     descricao: string;
   }>;
   endereco?: {
+    tipo_logradouro?: string;
     logradouro: string;
     numero: string;
     complemento?: string;
@@ -24,6 +28,7 @@ export interface CNPJData {
     cep: string;
   };
   telefone?: string;
+  telefone2?: string;
   email?: string;
   data_abertura?: string;
   regime_tributario?: string;
