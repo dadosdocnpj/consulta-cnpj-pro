@@ -17,6 +17,10 @@
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"></noscript>
     
     <link rel="icon" href="/src/assets/favicon.png" type="image/png">
+    
+    <!-- Critical resource preloading for faster FCP -->
+    <link rel="preload" href="/lovable-uploads/d54f0af5-d59b-4d5e-9876-ba7766fd200c.png" as="image" type="image/png">
+    
     <title>Consulta CNPJ gratuita - Empresas e CNAEs atualizados | Dados do CNPJ</title>
     <meta name="description" content="Consulte gratuitamente CNPJs, razão social, nome fantasia, CNAE e situação cadastral de milhões de empresas brasileiras. Dados atualizados mensalmente." />
     <meta name="author" content="Dados do CNPJ" />
@@ -36,6 +40,7 @@
 
   <body>
     <div id="root"></div>
+    <!-- Load main script with high priority -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
