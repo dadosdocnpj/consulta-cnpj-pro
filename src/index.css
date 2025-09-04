@@ -18,11 +18,11 @@ All colors MUST be HSL.
     --popover: 220 15% 98%;
     --popover-foreground: 220 15% 12%;
 
-    /* Modern Brazilian institutional theme */
-    --primary: 211 93% 51%;
+    /* Modern Brazilian institutional theme - WCAG AA compliant colors */
+    --primary: 211 93% 42%;
     --primary-foreground: 210 40% 98%;
-    --primary-light: 211 93% 75%;
-    --primary-glow: 211 93% 65%;
+    --primary-light: 211 93% 65%;
+    --primary-glow: 211 93% 55%;
     --primary-dark: 211 93% 35%;
 
     --secondary: 220 15% 16%;
@@ -30,9 +30,9 @@ All colors MUST be HSL.
     --secondary-light: 220 15% 85%;
     --secondary-glow: 220 15% 50%;
 
-    --accent: 185 95% 50%;
+    --accent: 185 95% 35%;
     --accent-foreground: 220 15% 12%;
-    --accent-light: 185 95% 75%;
+    --accent-light: 185 95% 55%;
 
     --muted: 220 13% 94%;
     --muted-foreground: 220 9% 42%;
