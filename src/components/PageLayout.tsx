@@ -1,8 +1,8 @@
 import React from "react";
-import { Helmet } from "react-helmet-async";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumb from "@/components/Breadcrumb";
+import SEOHead from "@/components/SEOHead";
 
 interface BreadcrumbItem {
   label: string;
@@ -19,23 +19,23 @@ interface PageLayoutProps {
 const PageLayout = ({ title, description, breadcrumbItems = [], children }: PageLayoutProps) => {
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>{title} | Dados do CNPJ</title>
-        <meta name="description" content={description} />
-        <link rel="canonical" href={`https://dadosdocnpj.com.br${window.location.pathname}`} />
-      </Helmet>
+      <SEOHead 
+        customTitle={title}
+        customDescription={description}
+        customUrl={`https://dadosdocnpj.com.br${window.location.pathname}`}
+      />
       
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8" itemScope itemType="https://schema.org/WebPage">
         {breadcrumbItems.length > 0 && (
           <Breadcrumb items={breadcrumbItems} />
         )}
         
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-4">{title}</h1>
-          <p className="text-lg text-muted-foreground">{description}</p>
-        </div>
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-4" itemProp="name">{title}</h1>
+          <p className="text-lg text-muted-foreground" itemProp="description">{description}</p>
+        </header>
         
         {children}
       </main>

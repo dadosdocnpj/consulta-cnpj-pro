@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Helmet } from 'react-helmet-async';
+import GeographicalBreadcrumb from '@/components/GeographicalBreadcrumb';
+import SEOHead from '@/components/SEOHead';
 import { 
   Building2, 
   MapPin, 
@@ -44,6 +45,7 @@ import PageLayout from '@/components/PageLayout';
 import { CNAEBreadcrumb } from '@/components/CNAEBreadcrumb';
 import { ContextualInfo } from '@/components/ContextualInfo';
 import { QRCodeGenerator } from '@/components/QRCodeGenerator';
+import InternalLinking from '@/components/InternalLinking';
 
 const CNPJPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -198,21 +200,20 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
   const SituacaoIcon = getSituacaoIcon(data.situacao_cadastral);
 
   return (
-    <>
-      <Helmet>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href={`${window.location.origin}/${slug}/`} />
-      </Helmet>
-
-      <PageLayout
-        title={data.razao_social || 'Empresa'}
-        description={`CNPJ: ${data.cnpj_formatado || data.cnpj} • ${data.endereco?.municipio || ''}, ${data.endereco?.uf || ''}`}
-        breadcrumbItems={breadcrumbItems}
-      >
+    <div className="min-h-screen bg-background">
+      <SEOHead empresa={data} customUrl={`https://dadosdocnpj.com.br${window.location.pathname}`} />
+      
+      <div className="container mx-auto px-4 py-8">
+        <GeographicalBreadcrumb empresa={data} />
+        
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-4" itemProp="name">
+            {data.razao_social || 'Empresa'}
+          </h1>
+          <p className="text-lg text-muted-foreground" itemProp="description">
+            CNPJ: {data.cnpj_formatado || data.cnpj} • {data.endereco?.municipio || ''}, {data.endereco?.uf || ''}
+          </p>
+        </header>
         <div className="space-y-8">
           {/* Header Card with Main Info */}
           <Card className="card-modern">
@@ -576,6 +577,9 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
             </div>
           )}
 
+          {/* Internal Linking Section */}
+          <InternalLinking empresa={data} />
+
           {/* Action Button */}
           <div className="text-center">
             <Link to="/">
@@ -585,8 +589,12 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
             </Link>
           </div>
         </div>
-      </PageLayout>
-    </>
+      </div>
+      
+      <footer className="bg-muted mt-16">
+        {/* Add footer component if needed */}
+      </footer>
+    </div>
   );
 };
 
