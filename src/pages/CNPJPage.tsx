@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCNPJBySlug } from '@/hooks/useCNPJBySlug';
+import { useCNAEHierarchy } from '@/hooks/useCNAEHierarchy';
+import { useContextualData, useSimilarCompanies } from '@/hooks/useContextualData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +25,8 @@ import {
   Clock,
   Map,
   Award,
-  QrCode
+  QrCode,
+  TrendingUp
 } from 'lucide-react';
 import { 
   formatCNPJ, 
@@ -38,10 +41,26 @@ import {
 } from '@/utils/cnpj';
 import { toast } from 'sonner';
 import PageLayout from '@/components/PageLayout';
+import { CNAEBreadcrumb } from '@/components/CNAEBreadcrumb';
+import { ContextualInfo } from '@/components/ContextualInfo';
+import { QRCodeGenerator } from '@/components/QRCodeGenerator';
 
 const CNPJPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data, isLoading, isError, error } = useCNPJBySlug(slug || '');
+  
+  // Buscar informações contextuais
+  const { data: cnaeHierarchy } = useCNAEHierarchy(data?.cnae_principal?.codigo || '');
+  const { data: contextualData } = useContextualData(
+    data?.cnae_principal?.codigo,
+    data?.endereco?.municipio,
+    data?.endereco?.uf
+  );
+  const { data: similarCompanies } = useSimilarCompanies(
+    data?.cnae_principal?.codigo,
+    data?.endereco?.municipio,
+    data?.endereco?.uf
+  );
 
   // Bot detection for SEO
   useEffect(() => {
@@ -473,6 +492,13 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* CNAE Hierarchy Breadcrumb */}
+              {cnaeHierarchy && (
+                <div className="mb-6">
+                  <CNAEBreadcrumb hierarchy={cnaeHierarchy} />
+                </div>
+              )}
+
               {data.cnae_principal && (
                 <div>
                   <h4 className="font-semibold text-lg mb-3 text-primary">Atividade Principal</h4>
@@ -521,6 +547,34 @@ ${data.cnae_principal ? `CNAE Principal: ${data.cnae_principal.codigo} - ${data.
               )}
             </CardContent>
           </Card>
+
+          {/* Contextual Information */}
+          {contextualData && (
+            <div>
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <TrendingUp className="h-6 w-6 text-primary" />
+                Informações Contextuais
+              </h2>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <ContextualInfo 
+                    contextualData={contextualData}
+                    cnaeCode={data.cnae_principal?.codigo}
+                    cidade={data.endereco?.municipio}
+                    uf={data.endereco?.uf}
+                    similarCompanies={similarCompanies}
+                  />
+                </div>
+                <div className="lg:col-span-1">
+                  <QRCodeGenerator 
+                    url={window.location.href}
+                    title={pageTitle}
+                    companyName={data.razao_social || 'Empresa'}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Action Button */}
           <div className="text-center">
