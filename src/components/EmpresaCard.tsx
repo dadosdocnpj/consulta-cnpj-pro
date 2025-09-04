@@ -20,11 +20,14 @@ const EmpresaCard = ({ empresa }: EmpresaCardProps) => {
   };
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-border/50 hover:border-primary/20">
-      <CardHeader className="pb-3">
+    <Card className="group bg-gradient-subtle border-border/50 hover:shadow-elegant transition-all duration-300 hover:scale-[1.02] hover:border-primary/50 relative overflow-hidden">
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      
+      <CardHeader className="pb-3 relative z-10">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center space-x-3 min-w-0 flex-1">
-            <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+            <div className="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
               <Building2 className="h-4 w-4 text-primary" />
             </div>
             <div className="min-w-0 flex-1">
@@ -54,7 +57,7 @@ const EmpresaCard = ({ empresa }: EmpresaCardProps) => {
         )}
       </CardHeader>
       
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 relative z-10">
         <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-md">
           <span className="text-xs font-medium text-muted-foreground">CNPJ:</span>
           <span className="text-sm font-mono text-foreground">{formatCNPJ(empresa.cnpj)}</span>

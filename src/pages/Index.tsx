@@ -1,12 +1,6 @@
 import { useParams } from "react-router-dom";
-import Header from "@/components/Header";
-import HeroSection from "@/components/HeroSection";
-import QuickNavigation from "@/components/QuickNavigation";
-import AboutSection from "@/components/AboutSection";
-import FAQSection from "@/components/FAQSection";
-import Footer from "@/components/Footer";
-import StructuredData from "@/components/StructuredData";
 import CNPJPage from "@/pages/CNPJPage";
+import Homepage from "@/pages/Homepage";
 
 const Index = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -17,19 +11,7 @@ const Index = () => {
   }
 
   // Caso contrário, renderizar a homepage
-  return (
-    <div className="min-h-screen">
-      <StructuredData />
-      <Header />
-      <main>
-        <HeroSection />
-        <QuickNavigation />
-        <AboutSection />
-        <FAQSection />
-      </main>
-      <Footer />
-    </div>
-  );
+  return <Homepage />;
 };
 
 export default Index;
