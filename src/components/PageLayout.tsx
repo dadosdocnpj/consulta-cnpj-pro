@@ -1,8 +1,9 @@
 import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import Breadcrumb from "@/components/Breadcrumb";
+import BreadcrumbsStructured from "@/components/BreadcrumbsStructured";
 import SEOHead from "@/components/SEOHead";
+import InternalLinkingOptimized from "@/components/InternalLinkingOptimized";
 
 interface BreadcrumbItem {
   label: string;
@@ -14,9 +15,10 @@ interface PageLayoutProps {
   description: string;
   breadcrumbItems?: BreadcrumbItem[];
   children: React.ReactNode;
+  showInternalLinks?: boolean;
 }
 
-const PageLayout = ({ title, description, breadcrumbItems = [], children }: PageLayoutProps) => {
+const PageLayout = ({ title, description, breadcrumbItems = [], children, showInternalLinks = true }: PageLayoutProps) => {
   return (
     <div className="min-h-screen">
       <SEOHead 
@@ -29,7 +31,7 @@ const PageLayout = ({ title, description, breadcrumbItems = [], children }: Page
       
       <main className="container mx-auto px-4 py-8" itemScope itemType="https://schema.org/WebPage">
         {breadcrumbItems.length > 0 && (
-          <Breadcrumb items={breadcrumbItems} />
+          <BreadcrumbsStructured items={breadcrumbItems} />
         )}
         
         <header className="mb-8">
@@ -38,6 +40,10 @@ const PageLayout = ({ title, description, breadcrumbItems = [], children }: Page
         </header>
         
         {children}
+        
+        {showInternalLinks && (
+          <InternalLinkingOptimized currentPage={window.location.pathname} />
+        )}
       </main>
       
       <Footer />

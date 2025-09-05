@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
+import GoogleAnalytics from "./components/GoogleAnalytics";
+import CoreWebVitals from "./components/CoreWebVitals";
 
 // Lazy load secondary pages to reduce initial bundle size
 const ExecuteImport = lazy(() => import("./pages/ExecuteImport"));
@@ -33,6 +35,8 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <HelmetProvider>
       <TooltipProvider>
+        <GoogleAnalytics />
+        <CoreWebVitals />
         <Toaster />
         <Sonner />
         <BrowserRouter>
