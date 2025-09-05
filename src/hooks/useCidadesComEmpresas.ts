@@ -14,7 +14,7 @@ export const useCidadesComEmpresas = () => {
       try {
         // Buscar todas as cidades que têm empresas
         const { data, error } = await supabase
-          .from('cnpj_cache')
+          .from('cnpj_public_cache')
           .select('json_data')
           .limit(5000); // Limitar para performance
 

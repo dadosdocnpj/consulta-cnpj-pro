@@ -55,7 +55,7 @@ serve(async (req) => {
       console.log('Executando busca por CNPJ:', cleanedNumbers);
       
       const searchResult = await supabaseClient
-        .from('cnpj_cache')
+        .from('cnpj_public_cache')
         .select('json_data, cnpj, slug')
         .ilike('cnpj', `${cleanedNumbers}%`)
         .limit(limit)
@@ -69,7 +69,7 @@ serve(async (req) => {
       console.log('Executando busca por nome da empresa');
       
       const searchResult = await supabaseClient
-        .from('cnpj_cache')
+        .from('cnpj_public_cache')
         .select('json_data, cnpj, slug')
         .or(`json_data->>razao_social.ilike.%${escapedQuery}%,json_data->>nome_fantasia.ilike.%${escapedQuery}%`)
         .limit(limit)

@@ -8,7 +8,7 @@ export const useEmpresasRecentes = (limit: number = 20) => {
     queryFn: async (): Promise<CNPJLookupResponse[]> => {
       try {
         const { data, error } = await supabase
-          .from('cnpj_cache')
+          .from('cnpj_public_cache')
           .select('json_data')
           .order('created_at', { ascending: false })
           .limit(limit);

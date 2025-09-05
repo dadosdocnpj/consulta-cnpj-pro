@@ -13,7 +13,7 @@ export const useCNAEEmpresas = (cnaeCode: string, page: number = 1, limit: numbe
       try {
         // Buscar empresas que tenham esse CNAE no cache
         const { data, error, count } = await supabase
-          .from('cnpj_cache')
+          .from('cnpj_public_cache')
           .select('json_data', { count: 'exact' })
           .or(`json_data->cnae_principal->>codigo.eq.${cnaeCode},json_data->cnaes_secundarios.cs.${JSON.stringify([{"codigo": cnaeCode}])}`)
           .range((page - 1) * limit, page * limit - 1)

@@ -361,6 +361,31 @@ async function getCNPJData(cnpj: string): Promise<CNPJData> {
 
 async function saveToCache(data: CNPJData, htmlContent: string) {
   try {
+    // Filter sensitive data before saving to public cache
+    const filteredData = {
+      cnpj: data.cnpj,
+      cnpj_formatado: data.cnpj_formatado,
+      razao_social: data.razao_social,
+      nome_fantasia: data.nome_fantasia,
+      situacao_cadastral: data.situacao_cadastral,
+      data_situacao_cadastral: data.data_situacao_cadastral,
+      data_abertura: data.data_abertura,
+      natureza_juridica: data.natureza_juridica,
+      cnae_principal: data.cnae_principal,
+      cnaes_secundarios: data.cnaes_secundarios,
+      endereco: data.endereco ? {
+        uf: data.endereco.uf,
+        municipio: data.endereco.municipio,
+        bairro: data.endereco.bairro
+        // Removed: logradouro, numero, complemento, cep
+      } : undefined,
+      slug: data.slug,
+      url_path: data.url_path,
+      status: data.status
+      // Removed: capital_social, email, telefone
+    };
+
+    // Save full data to sensitive cache (restricted access)
     await supabase
       .from('cnpj_cache')
       .upsert({
@@ -368,9 +393,21 @@ async function saveToCache(data: CNPJData, htmlContent: string) {
         slug: data.slug,
         html_content: htmlContent,
         json_data: data,
-        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24h
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
       });
-    console.log('Dados salvos no cache');
+
+    // Save filtered data to public cache
+    await supabase
+      .from('cnpj_public_cache')
+      .upsert({
+        cnpj: data.cnpj,
+        slug: data.slug,
+        html_content: htmlContent,
+        json_data: filteredData,
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      });
+
+    console.log('Dados salvos no cache público e privado');
   } catch (error) {
     console.error('Erro ao salvar no cache:', error);
   }
@@ -420,9 +457,9 @@ serve(async (req) => {
 
     console.log(`Renderizando página para slug validado: ${slug.substring(0, 20)}...`);
 
-    // Verificar se existe no cache primeiro
+    // Verificar se existe no cache público primeiro
     const { data: cached } = await supabase
-      .from('cnpj_cache')
+      .from('cnpj_public_cache')
       .select('html_content, expires_at')
       .eq('slug', slug)
       .gte('expires_at', new Date().toISOString())

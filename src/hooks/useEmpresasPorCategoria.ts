@@ -8,7 +8,7 @@ export const useEmpresasPorCategoria = (categoria: 'startups' | 'publicas', limi
     queryFn: async (): Promise<CNPJLookupResponse[]> => {
       try {
         let query = supabase
-          .from('cnpj_cache')
+          .from('cnpj_public_cache')
           .select('json_data')
           .limit(limit);
 

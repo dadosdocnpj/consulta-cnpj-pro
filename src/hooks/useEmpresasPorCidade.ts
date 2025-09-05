@@ -12,7 +12,7 @@ export const useEmpresasPorCidade = (uf: string, cidade: string, page: number = 
 
       try {
         const { data, error, count } = await supabase
-          .from('cnpj_cache')
+          .from('cnpj_public_cache')
           .select('json_data', { count: 'exact' })
           .eq('json_data->endereco->>uf', uf.toUpperCase())
           .ilike('json_data->endereco->>municipio', cidade.toUpperCase())

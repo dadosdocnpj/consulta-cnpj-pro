@@ -17,7 +17,7 @@ export const useCidadesDoEstado = (uf: string) => {
       try {
         // Buscar diretamente sem RPC function
         const { data, error } = await supabase
-          .from('cnpj_cache')
+          .from('cnpj_public_cache')
           .select('json_data')
           .eq('json_data->endereco->>uf', uf.toUpperCase());
 

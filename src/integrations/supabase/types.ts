@@ -262,6 +262,39 @@ export type Database = {
         }
         Relationships: []
       }
+      cnpj_public_cache: {
+        Row: {
+          cnpj: string
+          created_at: string
+          expires_at: string
+          html_content: string
+          id: string
+          json_data: Json
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          cnpj: string
+          created_at?: string
+          expires_at?: string
+          html_content: string
+          id?: string
+          json_data: Json
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          cnpj?: string
+          created_at?: string
+          expires_at?: string
+          html_content?: string
+          id?: string
+          json_data?: Json
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -270,6 +303,10 @@ export type Database = {
       cleanup_expired_cache: {
         Args: Record<PropertyKey, never>
         Returns: number
+      }
+      filter_sensitive_cnpj_data: {
+        Args: { data: Json }
+        Returns: Json
       }
     }
     Enums: {

@@ -12,7 +12,7 @@ export const useEmpresasPorEstado = (uf: string) => {
 
       try {
         const { data, error, count } = await supabase
-          .from('cnpj_cache')
+          .from('cnpj_public_cache')
           .select('json_data', { count: 'exact' })
           .eq('json_data->endereco->>uf', uf.toUpperCase())
           .order('created_at', { ascending: false });

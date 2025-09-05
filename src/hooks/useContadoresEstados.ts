@@ -13,7 +13,7 @@ export const useContadoresEstados = () => {
       try {
         // Buscar diretamente sem RPC function
         const { data, error } = await supabase
-          .from('cnpj_cache')
+          .from('cnpj_public_cache')
           .select('json_data')
           .limit(10000); // Limitar para evitar sobrecarga
 
