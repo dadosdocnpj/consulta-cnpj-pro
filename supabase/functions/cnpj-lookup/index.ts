@@ -243,6 +243,43 @@ serve(async (req) => {
       path: `/${slug}/`
     };
 
+    // Cache the complete data in the private cache (with sensitive info)
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    
+    if (supabaseUrl && supabaseServiceKey) {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      try {
+        // Store in private cache with full data
+        await supabase
+          .from('cnpj_cache')
+          .upsert({
+            cnpj: formattedCNPJ,
+            json_data: processedData,
+            html_content: '',
+            slug: slug,
+            expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+          }, { onConflict: 'cnpj' });
+
+        // Store in public cache - the trigger will automatically filter sensitive data
+        await supabase
+          .from('cnpj_public_cache')
+          .upsert({
+            cnpj: formattedCNPJ,
+            json_data: processedData, // Will be filtered by the trigger
+            html_content: '',
+            slug: slug,
+            expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+          }, { onConflict: 'cnpj' });
+
+        console.log(`Dados cachados para CNPJ: ${formattedCNPJ.substring(0, 8)}...`);
+      } catch (cacheError) {
+        console.error('Erro ao cachear dados:', cacheError);
+        // Don't fail the request if caching fails
+      }
+    }
+
     return new Response(
       JSON.stringify(processedData),
       { 
